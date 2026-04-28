@@ -1,0 +1,133 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-card" style="max-width:800px;margin:0 auto;">
+
+        {% if article.video_url %}
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:16px;margin-bottom:24px;background:#000;" id="video-container">
+                <iframe id="video-frame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+            </div>
+            <a id="video-btn" href="{{ article.video_url }}" target="_blank" style="display:none;margin-bottom:24px;" class="btn-glass-outline">▶ Смотреть видео на YouTube</a>
+            <script>
+            (function() {
+                var url = '{{ article.video_url|escapejs }}';
+                var embed = url;
+                var m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+                if (m) embed = 'https://www.youtube.com/embed/' + m[1];
+                m = url.match(/vimeo\.com\/(\d+)/);
+                if (m) embed = 'https://player.vimeo.com/video/' + m[1];
+                m = url.match(/rutube\.ru\/video\/([a-zA-Z0-9]+)/);
+                if (m) embed = 'https://rutube.ru/play/embed/' + m[1];
+
+                var frame = document.getElementById('video-frame');
+                frame.src = embed;
+                frame.onload = function() {
+                    document.getElementById('video-container').style.display = 'block';
+                    document.getElementById('video-btn').style.display = 'none';
+                };
+                frame.onerror = function() {
+                    document.getElementById('video-container').style.display = 'none';
+                    document.getElementById('video-btn').style.display = 'inline-block';
+                };
+                setTimeout(function() {
+                    if (getComputedStyle(document.getElementById('video-btn')).display === 'none' &&
+                        getComputedStyle(document.getElementById('video-container')).display === 'block') {
+                        // всё ок, видео загрузилось
+                    } else if (getComputedStyle(document.getElementById('video-btn')).display === 'none') {
+                        document.getElementById('video-container').style.display = 'none';
+                        document.getElementById('video-btn').style.display = 'inline-block';
+                    }
+                }, 4000);
+            })();
+            </script>
+        {% endif %}
+
+        {% if article.image and not article.video_url %}
+            <img src="{{ article.image.url }}" style="width:100%;max-height:400px;object-fit:cover;border-radius:16px;margin-bottom:24px;">
+        {% endif %}
+
+        <span class="badge-accent" style="display:inline-block;margin-bottom:12px;">{{ article.get_category_display }}</span>
+        <h1 style="font-weight:700;margin-bottom:16px;">{{ article.title }}</h1>
+        <p style="color:#666;font-size:18px;line-height:1.6;margin-bottom:24px;">{{ article.content }}</p>
+
+        <div style="display:flex;gap:16px;color:#999;margin-bottom:24px;">
+            <span>📅 {{ article.published_at|date:"d.m.Y" }}</span>
+            <span>❤️ <span id="likes-count">{{ article.likes.count }}</span></span>
+            <span>💬 <span id="comments-count">{{ article.comments.count }}</span></span>
+        </div>
+
+        {% if user.is_authenticated %}
+            <button onclick="toggleLike()" class="btn-glass-outline" id="like-btn" style="margin-bottom:24px;">
+                {% if user_liked %}❤️{% else %}🤍{% endif %}
+            </button>
+        {% endif %}
+
+        <h3 style="font-weight:700;margin-bottom:16px;">Комментарии (<span id="comments-total">{{ comments.count }}</span>)</h3>
+
+        {% if user.is_authenticated %}
+            <form id="comment-form" style="margin-bottom:24px;">
+                {% csrf_token %}
+                <textarea id="comment-text" rows="3" placeholder="Напишите комментарий..." style="width:100%;padding:14px;border-radius:14px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.6);font-family:Inter,sans-serif;resize:vertical;"></textarea>
+                <button type="submit" class="btn-glass" style="margin-top:8px;">Отправить</button>
+            </form>
+        {% else %}
+            <p><a href="/accounts/login/">Войдите</a>, чтобы оставить комментарий</p>
+        {% endif %}
+
+        <div id="comments-list">
+            {% for comment in comments %}
+                <div style="background:rgba(255,255,255,0.4);border-radius:14px;padding:16px;margin-bottom:12px;">
+                    <strong>{{ comment.user.get_full_name|default:comment.user.email }}</strong>
+                    <span style="color:#999;font-size:12px;margin-left:8px;">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                    <p style="margin-top:8px;">{{ comment.text }}</p>
+                </div>
+            {% empty %}
+                <p id="no-comments" style="color:#999;">Комментариев пока нет.</p>
+            {% endfor %}
+        </div>
+
+        <p style="margin-top:24px;"><a href="{% url 'article_list' %}" style="color:#1a73e8;">← Все статьи</a></p>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<script>
+async function toggleLike() {
+    const r = await fetch('{% url "article_toggle_like" article.slug %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+    });
+    const d = await r.json();
+    document.getElementById('likes-count').textContent = d.count;
+    document.getElementById('like-btn').innerHTML = d.liked ? '❤️' : '🤍';
+}
+
+document.getElementById('comment-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const text = document.getElementById('comment-text').value.trim();
+    if (!text) return;
+    const r = await fetch('{% url "article_add_comment" article.slug %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'text=' + encodeURIComponent(text)
+    });
+    const d = await r.json();
+    if (d.success) {
+        const list = document.getElementById('comments-list');
+        const no = document.getElementById('no-comments');
+        if (no) no.remove();
+        const div = document.createElement('div');
+        div.style.cssText = 'background:rgba(255,255,255,0.4);border-radius:14px;padding:16px;margin-bottom:12px;';
+        div.innerHTML = '<strong>' + d.user + '</strong> <span style="color:#999;font-size:12px;">' + d.date + '</span><p style="margin-top:8px;">' + d.text + '</p>';
+        list.prepend(div);
+        document.getElementById('comment-text').value = '';
+        document.getElementById('comments-count').textContent = d.total;
+        document.getElementById('comments-total').textContent = d.total;
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

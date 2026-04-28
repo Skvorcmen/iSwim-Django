@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Академия плавания</h1>
+    
+    <div class="glass-card" style="margin-bottom:30px;padding:24px;">
+        <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <input type="text" name="search" value="{{ current_search }}" placeholder="🔍 Поиск по статьям..." style="flex:2;min-width:180px;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:14px;">
+            <select name="category" style="flex:1;min-width:130px;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:14px;">
+                <option value="">Все категории</option>
+                {% for key, name in categories %}
+                    <option value="{{ key }}" {% if current_category == key %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <select name="sort" style="flex:1;min-width:130px;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:14px;">
+                <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Сначала новые</option>
+                <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Сначала старые</option>
+                <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Популярные</option>
+            </select>
+            <button type="submit" class="btn-glass" style="white-space:nowrap;font-size:14px;padding:10px 18px;">Найти</button>
+            {% if current_search or current_category %}
+                <a href="{% url 'article_list' %}" class="btn-glass-outline" style="white-space:nowrap;font-size:14px;padding:10px 18px;">Сбросить</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="grid-3">
+        {% for article in articles %}
+            <a href="{% url 'article_detail' article.slug %}" style="text-decoration:none;color:inherit;">
+                <div class="glass-card" style="height:100%;">
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" style="width:100%;height:200px;object-fit:cover;border-radius:16px;margin-bottom:16px;">
+                    {% endif %}
+                    <span class="badge-accent" style="display:inline-block;margin-bottom:8px;">{{ article.get_category_display }}</span>
+                    <h3 style="font-weight:700;margin-bottom:8px;">{{ article.title }}</h3>
+                    <p style="color:#666;margin-bottom:12px;">{{ article.content|truncatewords:20 }}</p>
+                    <div style="display:flex;gap:16px;align-items:center;color:#999;font-size:14px;">
+                        <span>❤️ {{ article.likes.count }}</span>
+                        <span>💬 {{ article.comments.count }}</span>
+                        <span>📅 {{ article.published_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+            <div class="glass-card" style="grid-column:1/-1;text-align:center;padding:48px;">
+                <p style="color:#999;font-size:18px;">😔 Статей пока нет</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

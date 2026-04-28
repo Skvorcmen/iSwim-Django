@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>{{ trainer.user.get_full_name }}</h1>
+{% if trainer.photo %}<img src="{{ trainer.photo.url }}" style="max-width: 300px;">{% endif %}
+<p><strong>Специализация:</strong> {{ trainer.specialization }}</p>
+<p><strong>Стаж:</strong> {{ trainer.experience_years }} лет</p>
+<p>{{ trainer.bio }}</p>
+
+<h2>Филиалы</h2>
+{% for branch in trainer.branches.all %}
+    <p><a href="{% url 'branch_detail' branch.pk %}">{{ branch.name }}</a></p>
+{% endfor %}
+<p><a href="{% url 'trainer_list' %}">← Все тренеры</a></p>
+{% endblock %}

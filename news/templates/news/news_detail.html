@@ -1,0 +1,100 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-card" style="max-width:800px;margin:0 auto;">
+        {% if news.image %}
+            <img src="{{ news.image.url }}" style="width:100%;max-height:400px;object-fit:cover;border-radius:16px;margin-bottom:24px;">
+        {% endif %}
+        <h1 style="font-weight:700;margin-bottom:16px;">{{ news.title }}</h1>
+        <p style="color:#666;font-size:18px;line-height:1.6;margin-bottom:24px;">{{ news.full_text }}</p>
+        <div style="display:flex;gap:16px;align-items:center;color:#999;margin-bottom:24px;">
+            <span>📅 {{ news.published_at|date:"d.m.Y" }}</span>
+            <span>❤️ <span id="likes-count">{{ news.likes.count }}</span></span>
+            <span>💬 <span id="comments-count">{{ news.comments.count }}</span></span>
+        </div>
+        
+        {% if user.is_authenticated %}
+            <button onclick="toggleLike()" class="btn-glass-outline" id="like-btn" style="margin-bottom:24px;">
+                {% if user_liked %}❤️ Убрать лайк{% else %}🤍 Лайкнуть{% endif %}
+            </button>
+        {% endif %}
+
+        <h3 style="font-weight:700;margin-bottom:16px;">Комментарии (<span id="comments-total">{{ comments.count }}</span>)</h3>
+        
+        {% if user.is_authenticated %}
+            <form id="comment-form" style="margin-bottom:24px;">
+                {% csrf_token %}
+                <textarea id="comment-text" rows="3" placeholder="Напишите комментарий..." style="width:100%;padding:14px;border-radius:14px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.6);font-family:'Inter',sans-serif;resize:vertical;"></textarea>
+                <button type="submit" class="btn-glass" style="margin-top:8px;">Отправить</button>
+            </form>
+        {% else %}
+            <p style="margin-bottom:24px;"><a href="/accounts/login/">Войдите</a>, чтобы оставить комментарий</p>
+        {% endif %}
+
+        <div id="comments-list">
+            {% for comment in comments %}
+                <div class="comment-item" style="background:rgba(255,255,255,0.4);border-radius:14px;padding:16px;margin-bottom:12px;">
+                    <strong>{{ comment.user.get_full_name|default:comment.user.email }}</strong>
+                    <span style="color:#999;font-size:12px;margin-left:8px;">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                    <p style="margin-top:8px;">{{ comment.text }}</p>
+                </div>
+            {% empty %}
+                <p id="no-comments" style="color:#999;">Комментариев пока нет. Будьте первым!</p>
+            {% endfor %}
+        </div>
+
+        <p style="margin-top:24px;"><a href="{% url 'news_list' %}" style="color:#1a73e8;">← Все новости</a></p>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<script>
+async function toggleLike() {
+    const response = await fetch('{% url "toggle_like" news.slug %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    });
+    const data = await response.json();
+    document.getElementById('likes-count').textContent = data.count;
+    const btn = document.getElementById('like-btn');
+    btn.innerHTML = data.liked ? '❤️ Убрать лайк' : '🤍 Лайкнуть';
+}
+
+document.getElementById('comment-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const text = document.getElementById('comment-text').value.trim();
+    if (!text) return;
+    
+    const response = await fetch('{% url "add_comment_ajax" news.slug %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'text=' + encodeURIComponent(text)
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+        const commentsList = document.getElementById('comments-list');
+        const noComments = document.getElementById('no-comments');
+        if (noComments) noComments.remove();
+        
+        const newComment = document.createElement('div');
+        newComment.className = 'comment-item';
+        newComment.style.cssText = 'background:rgba(255,255,255,0.4);border-radius:14px;padding:16px;margin-bottom:12px;animation:fadeInUp 0.4s ease-out;';
+        newComment.innerHTML = `
+            <strong>${data.user}</strong>
+            <span style="color:#999;font-size:12px;margin-left:8px;">${data.date}</span>
+            <p style="margin-top:8px;">${data.text}</p>
+        `;
+        commentsList.prepend(newComment);
+        
+        document.getElementById('comment-text').value = '';
+        document.getElementById('comments-count').textContent = data.total;
+        document.getElementById('comments-total').textContent = data.total;
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>Личный кабинет тренера</h1>
+<p><strong>Имя:</strong> {{ user.get_full_name }}</p>
+<p><strong>Специализация:</strong> {{ trainer.specialization }}</p>
+<p><strong>Стаж:</strong> {{ trainer.experience_years }} лет</p>
+
+<h2>Мои группы</h2>
+<p>Список групп и спортсменов появится здесь</p>
+
+<h2>Расписание тренировок</h2>
+<p>Планировщик тренировок появится здесь</p>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Новости</h1>
+    
+    <div class="glass-card" style="margin-bottom:30px;padding:24px;">
+        <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <input type="text" name="search" value="{{ current_search }}" placeholder="🔍 Поиск по новостям..." style="flex:2;min-width:180px;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:14px;">
+            <select name="year" style="flex:1;min-width:110px;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:14px;">
+                <option value="">Все года</option>
+                {% for year in years %}
+                    <option value="{{ year }}" {% if current_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+            <select name="month" style="flex:1;min-width:110px;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:14px;">
+                <option value="">Все месяцы</option>
+                <option value="1" {% if current_month == '1' %}selected{% endif %}>Январь</option>
+                <option value="2" {% if current_month == '2' %}selected{% endif %}>Февраль</option>
+                <option value="3" {% if current_month == '3' %}selected{% endif %}>Март</option>
+                <option value="4" {% if current_month == '4' %}selected{% endif %}>Апрель</option>
+                <option value="5" {% if current_month == '5' %}selected{% endif %}>Май</option>
+                <option value="6" {% if current_month == '6' %}selected{% endif %}>Июнь</option>
+                <option value="7" {% if current_month == '7' %}selected{% endif %}>Июль</option>
+                <option value="8" {% if current_month == '8' %}selected{% endif %}>Август</option>
+                <option value="9" {% if current_month == '9' %}selected{% endif %}>Сентябрь</option>
+                <option value="10" {% if current_month == '10' %}selected{% endif %}>Октябрь</option>
+                <option value="11" {% if current_month == '11' %}selected{% endif %}>Ноябрь</option>
+                <option value="12" {% if current_month == '12' %}selected{% endif %}>Декабрь</option>
+            </select>
+            <select name="sort" style="flex:1;min-width:130px;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:14px;">
+                <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Сначала новые</option>
+                <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Сначала старые</option>
+                <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Популярные</option>
+            </select>
+            <button type="submit" class="btn-glass" style="white-space:nowrap;font-size:14px;padding:10px 18px;">Найти</button>
+            {% if current_search or current_year or current_month %}
+                <a href="{% url 'news_list' %}" class="btn-glass-outline" style="white-space:nowrap;font-size:14px;padding:10px 18px;">Сбросить</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="grid-3">
+        {% for item in news_list %}
+            <a href="{% url 'news_detail' item.slug %}" style="text-decoration:none;color:inherit;">
+                <div class="glass-card" style="height:100%;">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" style="width:100%;height:200px;object-fit:cover;border-radius:16px;margin-bottom:16px;">
+                    {% endif %}
+                    <h3 style="font-weight:700;margin-bottom:8px;">{{ item.title }}</h3>
+                    <p style="color:#666;margin-bottom:12px;">{{ item.short_text|truncatewords:20 }}</p>
+                    <div style="display:flex;gap:16px;align-items:center;color:#999;font-size:14px;">
+                        <span>❤️ {{ item.likes.count }}</span>
+                        <span>💬 {{ item.comments.count }}</span>
+                        <span>📅 {{ item.published_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+            <div class="glass-card" style="grid-column:1/-1;text-align:center;padding:48px;">
+                <p style="color:#999;font-size:18px;">😔 Ничего не найдено</p>
+                <a href="{% url 'news_list' %}" style="color:#1a73e8;">Показать все новости</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

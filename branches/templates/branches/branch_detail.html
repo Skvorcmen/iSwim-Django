@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>{{ branch.name }}</h1>
+{% if branch.photo %}<img src="{{ branch.photo.url }}" style="max-width: 600px;">{% endif %}
+<p><strong>Адрес:</strong> {{ branch.address }}</p>
+<p><strong>Телефон:</strong> {{ branch.phone }}</p>
+<p><strong>Расписание:</strong> {{ branch.schedule }}</p>
+{% if branch.map_link %}<p><a href="{{ branch.map_link }}">Открыть на карте</a></p>{% endif %}
+
+<h2>Тренеры филиала</h2>
+{% for trainer in branch.trainers.all %}
+    <div style="margin-bottom: 20px;">
+        {% if trainer.photo %}<img src="{{ trainer.photo.url }}" style="max-width: 100px; border-radius: 50%;">{% endif %}
+        <h3><a href="{% url 'trainer_detail' trainer.pk %}">{{ trainer.user.get_full_name }}</a></h3>
+        <p>{{ trainer.specialization }}</p>
+        <p>Стаж: {{ trainer.experience_years }} лет</p>
+    </div>
+{% empty %}
+    <p>Тренеры пока не добавлены</p>
+{% endfor %}
+<p><a href="{% url 'branch_list' %}">← Все филиалы</a></p>
+{% endblock %}

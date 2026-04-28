@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>Личный кабинет болельщика</h1>
+<p><strong>Имя:</strong> {{ user.get_full_name }}</p>
+
+<h2>Избранные спортсмены</h2>
+{% for athlete in user.fan_profile.favorite_athletes.all %}
+    <p>{{ athlete.user.get_full_name }}</p>
+{% empty %}
+    <p>Пока нет избранных спортсменов</p>
+{% endfor %}
+
+<h2>Ближайшие соревнования</h2>
+<p>Календарь соревнований появится здесь</p>
+{% endblock %}

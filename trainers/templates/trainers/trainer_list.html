@@ -1,0 +1,12 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>Наши тренеры</h1>
+{% for trainer in trainers %}
+    <div style="margin-bottom: 30px;">
+        {% if trainer.photo %}<img src="{{ trainer.photo.url }}" style="max-width: 150px; border-radius: 50%;">{% endif %}
+        <h2><a href="{% url 'trainer_detail' trainer.pk %}">{{ trainer.user.get_full_name }}</a></h2>
+        <p>{{ trainer.specialization }}</p>
+        <p>Стаж: {{ trainer.experience_years }} лет</p>
+    </div>
+{% endfor %}
+{% endblock %}

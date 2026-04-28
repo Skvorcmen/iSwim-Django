@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>Наши филиалы</h1>
+{% for branch in branches %}
+    <div style="margin-bottom: 30px;">
+        <h2><a href="{% url 'branch_detail' branch.pk %}">{{ branch.name }}</a></h2>
+        {% if branch.photo %}<img src="{{ branch.photo.url }}" style="max-width: 300px;">{% endif %}
+        <p>{{ branch.address }}</p>
+        <p>{{ branch.phone }}</p>
+        <p>{{ branch.schedule }}</p>
+    </div>
+{% endfor %}
+{% endblock %}
