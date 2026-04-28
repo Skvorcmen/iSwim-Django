@@ -16,3 +16,31 @@ class News(models.Model):
         verbose_name = 'Новость'
         verbose_name_plural = 'Новости'
         ordering = ['-published_at']
+from users.models import User
+
+class NewsComment(models.Model):
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='comments', verbose_name='Новость')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    text = models.TextField(verbose_name='Комментарий')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата')
+
+    def __str__(self):
+        return f'{self.user}: {self.text[:30]}'
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-created_at']
+
+class NewsLike(models.Model):
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='likes', verbose_name='Новость')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата')
+
+    def __str__(self):
+        return f'{self.user} лайкнул {self.news}'
+
+    class Meta:
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'
+        unique_together = ['news', 'user']
