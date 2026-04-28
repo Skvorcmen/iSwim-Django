@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="создал админки для тренеров, новостей, филиалов">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/academy/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/academy/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/academy/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/academy/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/academy/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/academy/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/branches/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/branches/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/news/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/news/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/news/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/news/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/news/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/news/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/swim_site/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/swim_site/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trainers/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainers/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
-    </list>
+    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -87,7 +72,7 @@
       <option name="presentableId" value="Default" />
       <updated>1773637452534</updated>
       <workItem from="1773637453547" duration="176000" />
-      <workItem from="1777374987758" duration="4967000" />
+      <workItem from="1777374987758" duration="5273000" />
     </task>
     <task id="LOCAL-00001" summary="создал джанго приложение с папками">
       <option name="closed" value="true" />
@@ -121,7 +106,23 @@
       <option name="project" value="LOCAL" />
       <updated>1777376002036</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск">
+      <option name="closed" value="true" />
+      <created>1777380920569</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1777380920569</updated>
+    </task>
+    <task id="LOCAL-00006" summary="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск">
+      <option name="closed" value="true" />
+      <created>1777380927049</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1777380927049</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -132,7 +133,8 @@
     <MESSAGE value="настройка проекта + кастомный User" />
     <MESSAGE value="подготовили примитивные модели" />
     <MESSAGE value="создал админки для тренеров, новостей, филиалов" />
-    <option name="LAST_COMMIT_MESSAGE" value="создал админки для тренеров, новостей, филиалов" />
+    <MESSAGE value="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск" />
+    <option name="LAST_COMMIT_MESSAGE" value="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
