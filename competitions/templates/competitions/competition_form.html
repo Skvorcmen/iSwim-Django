@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-card" style="max-width:700px;margin:0 auto;">
+        <h2>Создать соревнование</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div style="margin-bottom:12px;">
+                    <label style="font-weight:500;">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            
+            <h3 style="margin-top:24px;">Возрастные категории</h3>
+            <div id="cat-rows">
+                <div class="cat-row" style="display:flex;gap:8px;margin-bottom:8px;">
+                    <input type="text" name="cat_name" placeholder="Название (2010-2011)" style="flex:2;">
+                    <input type="number" name="cat_from" placeholder="Год от" style="flex:1;">
+                    <input type="number" name="cat_to" placeholder="Год до" style="flex:1;">
+                    <select name="cat_gender" style="flex:1;">
+                        <option value="M">Муж</option>
+                        <option value="F">Жен</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" onclick="addCat()" class="btn-glass-outline" style="margin-bottom:16px;">+ Категория</button>
+            
+            <h3>Дисциплины</h3>
+            <div id="disc-rows">
+                <div class="disc-row" style="display:flex;gap:8px;margin-bottom:8px;">
+                    <select name="style" style="flex:2;">
+                        <option value="free">Вольный стиль</option>
+                        <option value="back">На спине</option>
+                        <option value="breast">Брасс</option>
+                        <option value="fly">Баттерфляй</option>
+                        <option value="medley">Комплекс</option>
+                    </select>
+                    <input type="number" name="distance" placeholder="Дистанция (м)" style="flex:1;">
+                </div>
+            </div>
+            <button type="button" onclick="addDisc()" class="btn-glass-outline" style="margin-bottom:16px;">+ Дисциплина</button>
+            
+            <button type="submit" class="btn-glass" style="margin-top:16px;">Создать</button>
+        </form>
+    </div>
+</div>
+<style>
+input, select, textarea { width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); margin-top:4px; font-family:Inter,sans-serif; }
+.cat-row input, .cat-row select, .disc-row input, .disc-row select { margin-top:0; }
+</style>
+<script>
+function addCat() {
+    const rows = document.getElementById('cat-rows');
+    const row = rows.querySelector('.cat-row').cloneNode(true);
+    rows.appendChild(row);
+}
+function addDisc() {
+    const rows = document.getElementById('disc-rows');
+    const row = rows.querySelector('.disc-row').cloneNode(true);
+    rows.appendChild(row);
+}
+</script>
+{% endblock %}

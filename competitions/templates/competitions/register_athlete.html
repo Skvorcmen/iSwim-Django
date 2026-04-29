@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-card" style="max-width:700px;margin:0 auto;">
+        <h2>Подать заявку — {{ comp.title }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin:16px 0;">
+                <label>Дисциплина:</label>
+                <select name="discipline" required style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);margin-top:4px;">
+                    {% for d in disciplines %}
+                        <option value="{{ d.id }}">{{ d.get_style_display }} {{ d.distance }}м</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="athlete-rows">
+                <div class="athlete-row" style="display:flex;gap:8px;margin-bottom:8px;">
+                    <select name="athlete_ids" required style="flex:2;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);">
+                        {% for a in athletes %}
+                            <option value="{{ a.id }}">{{ a.user.get_full_name }} ({{ a.get_swimming_level_display }})</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="preliminary_time" placeholder="Время (00:00,00)" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);">
+                </div>
+            </div>
+            <button type="button" onclick="addRow()" class="btn-glass-outline" style="margin-bottom:16px;">+ Добавить спортсмена</button><br>
+            <button type="submit" class="btn-glass">Отправить заявку</button>
+        </form>
+    </div>
+</div>
+<script>
+function addRow() {
+    const rows = document.getElementById('athlete-rows');
+    const row = rows.querySelector('.athlete-row').cloneNode(true);
+    rows.appendChild(row);
+}
+</script>
+{% endblock %}

@@ -1,22 +1,30 @@
 from django.contrib import admin
-from .models import Competition, Registration, Result, BranchScore
+from .models import Competition, AgeCategory, Discipline, Registration, Heat, HeatAssignment
+
+class AgeCategoryInline(admin.TabularInline):
+    model = AgeCategory
+    extra = 1
+
+class DisciplineInline(admin.TabularInline):
+    model = Discipline
+    extra = 1
 
 @admin.register(Competition)
 class CompetitionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'start_date', 'status', 'registered_count', 'location')
-    list_filter = ('status', 'branch')
-    search_fields = ('title', 'location')
+    list_display = ('title', 'start_date', 'status', 'location')
+    list_filter = ('status',)
+    inlines = [AgeCategoryInline, DisciplineInline]
+    search_fields = ('title',)
 
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
-    list_display = ('competition', 'athlete', 'created_at', 'is_confirmed')
-    list_filter = ('is_confirmed', 'competition')
-
-@admin.register(Result)
-class ResultAdmin(admin.ModelAdmin):
-    list_display = ('competition', 'athlete', 'discipline', 'place', 'result_time')
+    list_display = ('athlete', 'discipline', 'competition', 'preliminary_time', 'is_confirmed')
     list_filter = ('competition', 'discipline')
 
-@admin.register(BranchScore)
-class BranchScoreAdmin(admin.ModelAdmin):
-    list_display = ('competition', 'branch', 'total_points', 'gold', 'silver', 'bronze')
+@admin.register(Heat)
+class HeatAdmin(admin.ModelAdmin):
+    list_display = ('id', 'competition', 'discipline', 'age_category', 'number')
+
+@admin.register(HeatAssignment)
+class HeatAssignmentAdmin(admin.ModelAdmin):
+    list_display = ('heat', 'registration', 'lane', 'result_time', 'place')

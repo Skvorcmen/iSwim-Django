@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div style="max-width:500px;margin:40px auto;padding:0 16px;">
+    <div class="glass-card" style="padding:32px;">
+        <h2 style="font-weight:700;margin-bottom:20px;">Ручная заявка — {{ comp.title }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Фамилия</label>
+                    <input type="text" name="last_name" required style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Имя</label>
+                    <input type="text" name="first_name" required style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Пол</label>
+                    <select name="gender" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                        <option value="M">Мужчина</option>
+                        <option value="F">Женщина</option>
+                    </select>
+                </div>
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Год рождения</label>
+                    <input type="number" name="birth_year" value="2010" required style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Стиль</label>
+                    <select name="style" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                        <option value="free">Вольный стиль</option>
+                        <option value="back">На спине</option>
+                        <option value="breast">Брасс</option>
+                        <option value="fly">Баттерфляй</option>
+                        <option value="medley">Комплекс</option>
+                    </select>
+                </div>
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Дистанция (м)</label>
+                    <input type="number" name="distance" value="50" required style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Тренер</label>
+                    <select name="coach_id" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                        <option value="">Выберите тренера</option>
+                        {% for t in coaches %}
+                            <option value="{{ t.id }}">{{ t.user.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="flex:1;">
+                    <label style="font-weight:500;font-size:14px;">Филиал</label>
+                    <select name="branch_id" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+                        <option value="">Выберите филиал</option>
+                        {% for b in branches %}
+                            <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="font-weight:500;font-size:14px;">Предв. время (00:00,00)</label>
+                <input type="text" name="time" placeholder="00:30,00" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:4px;">
+            </div>
+            <button type="submit" class="btn-glass" style="width:100%;">Добавить спортсмена</button>
+        </form>
+        <p style="margin-top:16px;"><a href="{% url 'competition_detail' comp.pk %}" style="color:#666;">← Назад</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -23,6 +23,7 @@ class AthleteProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='athlete_profile', verbose_name='Пользователь')
     birth_date = models.DateField(verbose_name='Дата рождения')
     swimming_level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='beginner', verbose_name='Уровень')
+    gender = models.CharField(max_length=1, choices=[("M", "Мужчина"), ("F", "Женщина")], default="M", verbose_name="Пол")
     medical_notes = models.TextField(blank=True, verbose_name='Мед. противопоказания')
     parent_contact = models.CharField(max_length=20, blank=True, verbose_name='Контакт родителя')
 
@@ -66,3 +67,15 @@ class Achievement(models.Model):
         verbose_name = 'Достижение'
         verbose_name_plural = 'Достижения'
         ordering = ['-date']
+
+class SecretaryProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='secretary_profile', verbose_name='Пользователь')
+    phone = models.CharField(max_length=20, blank=True, verbose_name='Телефон')
+
+    def __str__(self):
+        return f'Секретарь: {self.user.get_full_name()}'
+
+    class Meta:
+        verbose_name = 'Секретарь'
+        verbose_name_plural = 'Секретари'
+# Добавлено поле gender в AthleteProfile

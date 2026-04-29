@@ -1,0 +1,174 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container" style="max-width:900px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h1 class="page-title" style="margin:0;">Заплывы — {{ comp.title }}</h1>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <button id="edit-mode-btn" onclick="toggleEditMode()" class="btn-glass-outline" style="font-size:13px;">✎ Режим редактирования</button>
+            <a href="{% url 'competition_detail' comp.pk %}" class="btn-glass-outline">← Назад</a>
+        </div>
+    </div>
+
+    {% if groups %}
+    <div id="all-groups">
+    {% for group in groups %}
+        <div class="group-block" data-group-id="{{ group.category.id }}-{{ group.discipline.id }}" style="margin-bottom:32px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <div class="group-arrows" style="display:none;flex-direction:column;gap:2px;">
+                    <span onclick="moveGroup(this, -1)" style="cursor:pointer;color:#1a73e8;font-size:14px;">▲</span>
+                    <span onclick="moveGroup(this, 1)" style="cursor:pointer;color:#1a73e8;font-size:14px;">▼</span>
+                </div>
+                <div style="flex:1;padding:12px 16px;background:rgba(26,115,232,0.05);border-radius:12px;display:flex;align-items:center;gap:8px;">
+                    <h2 style="font-weight:700;color:#1a73e8;margin:0;font-size:18px;flex:1;">
+                        {{ group.category.name }} ({{ group.category.get_gender_display }}) — {{ group.discipline.get_style_display }} {{ group.discipline.distance }}м
+                    </h2>
+                    <button onclick="openAddModal({{ comp.pk }}, {{ group.category.id }}, {{ group.discipline.id }})" class="btn-glass-outline" style="font-size:11px;padding:4px 10px;">+ Участник</button>
+                    <a href="{% url 'generate_heats' comp.pk %}" style="color:#999;font-size:12px;text-decoration:none;">🔄</a>
+                    <a href="{% url 'finalize_results' comp.pk group.discipline.id group.category.id %}" style="background:#27ae60;color:white;padding:6px 14px;border-radius:8px;font-size:12px;text-decoration:none;font-weight:600;" onclick="return confirm('Завершить дисциплину?')">✅ Завершить</a>
+                </div>
+            </div>
+
+            <div class="heats-container" style="padding-left:32px;">
+            {% for heat in group.heats %}
+                <div class="glass-card heat-card" data-heat-id="{{ heat.id }}" style="margin-bottom:8px;padding:14px 20px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                        <div class="heat-arrows" style="display:none;flex-direction:column;gap:2px;">
+                            <span onclick="moveHeat(this, -1)" style="cursor:pointer;color:#1a73e8;font-size:12px;">▲</span>
+                            <span onclick="moveHeat(this, 1)" style="cursor:pointer;color:#1a73e8;font-size:12px;">▼</span>
+                        </div>
+                        <span style="font-weight:600;">Заплыв <span class="heat-number">{{ heat.number }}</span></span>
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
+                                <th style="padding:6px 10px;text-align:left;font-weight:600;font-size:13px;width:40px;">Дор.</th>
+                                <th style="padding:6px 10px;text-align:left;font-weight:600;font-size:13px;">Спортсмен</th>
+                                <th style="padding:6px 10px;text-align:right;font-weight:600;font-size:13px;width:90px;">Рез-т</th>
+                                <th style="padding:6px 10px;text-align:center;font-weight:600;font-size:13px;width:50px;">Место</th>
+                            </tr>
+                        </thead>
+                        <tbody id="heat-{{ heat.id }}"></tbody>
+                    </table>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+    <div id="save-all-bar" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a73e8;color:white;padding:12px 24px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.2);z-index:100;gap:12px;align-items:center;">
+        <span>Изменения не сохранены</span>
+        <button onclick="saveAll()" style="background:white;color:#1a73e8;border:none;padding:8px 20px;border-radius:10px;font-weight:600;cursor:pointer;">Сохранить</button>
+        <button onclick="cancelEdit()" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.5);padding:8px 20px;border-radius:10px;cursor:pointer;">Отмена</button>
+    </div>
+    {% else %}
+        <p style="color:#999;">Заплывы не сформированы</p>
+        <a href="{% url 'generate_heats' comp.pk %}" class="btn-glass" style="margin-top:12px;display:inline-block;">Сформировать заплывы</a>
+    {% endif %}
+</div>
+
+<div id="add-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:200;justify-content:center;align-items:center;">
+    <div class="glass-card" style="max-width:400px;width:90%;padding:24px;">
+        <h3>Добавить участника</h3>
+        <label style="font-weight:500;">Спортсмен:</label>
+        <select id="modal-athlete" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-bottom:12px;"><option value="">Выберите...</option></select>
+        <label style="font-weight:500;">Заплыв:</label>
+        <select id="modal-heat" onchange="updateLanes()" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;margin-bottom:12px;"></select>
+        <label style="font-weight:500;">Дорожка:</label>
+        <select id="modal-lane" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;margin-bottom:16px;"></select>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button onclick="document.getElementById('add-modal').style.display='none'" class="btn-glass-outline">Отмена</button>
+            <button onclick="modalAdd()" class="btn-glass">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let editMode = false, hasChanges = false, originalOrder = null;
+
+// Загрузка данных заплывов
+document.querySelectorAll('tbody[id^="heat-"]').forEach(async tbody => {
+    const heatId = tbody.id.replace('heat-', '');
+    try {
+        const r = await fetch('/competitions/heats/' + heatId + '/data/');
+        const data = await r.json();
+        tbody.innerHTML = data.map(a => `<tr style="border-bottom:1px solid rgba(0,0,0,0.03);">
+            <td style="padding:6px 10px;font-weight:700;color:#1a73e8;">${a.lane}</td>
+            <td style="padding:6px 10px;">${a.name}${!a.has_result && editMode ? ' <span onclick="removeAthlete('+a.id+')" style="color:#ff3b30;cursor:pointer;">✕</span>' : ''}</td>
+            <td style="padding:6px 10px;text-align:right;font-family:monospace;">${a.result_time||'—'}</td>
+            <td style="padding:6px 10px;text-align:center;font-weight:700;">${a.place||'—'}</td>
+        </tr>`).join('');
+    } catch(e) {}
+});
+
+function toggleEditMode() {
+    editMode = !editMode;
+    const btn = document.getElementById('edit-mode-btn');
+    btn.textContent = editMode ? '✎ Выйти' : '✎ Редактировать';
+    btn.style.background = editMode ? '#1a73e8' : '';
+    btn.style.color = editMode ? 'white' : '';
+    document.querySelectorAll('.group-arrows, .heat-arrows').forEach(a => a.style.display = editMode?'flex':'none');
+    if (editMode) { saveOriginalOrder(); } else if (hasChanges) { document.getElementById('save-all-bar').style.display='flex'; } else { exitEditMode(); }
+}
+
+function exitEditMode() { editMode=false; document.querySelectorAll('.group-arrows, .heat-arrows').forEach(a=>a.style.display='none'); document.getElementById('save-all-bar').style.display='none'; }
+
+function moveHeat(s, d) {
+    const c = s.closest('.heat-card'), p = c.parentElement, arr = [...p.querySelectorAll('.heat-card')], i = arr.indexOf(c), n = i+d;
+    if (n<0||n>=arr.length) return;
+    d<0?p.insertBefore(c,arr[n]):p.insertBefore(arr[n],c);
+    p.querySelectorAll('.heat-card').forEach((c,i)=>c.querySelector('.heat-number').textContent=i+1);
+    hasChanges=true;
+}
+
+function moveGroup(s, d) {
+    const g = s.closest('.group-block'), p = document.getElementById('all-groups'), arr = [...p.querySelectorAll('.group-block')], i = arr.indexOf(g), n = i+d;
+    if (n<0||n>=arr.length) return;
+    d<0?p.insertBefore(g,arr[n]):p.insertBefore(arr[n],g);
+    hasChanges=true;
+}
+
+async function saveAll() {
+    for (let c of document.querySelectorAll('.heats-container')) {
+        const d = [...c.querySelectorAll('.heat-card')].map((c,i)=>({id:parseInt(c.dataset.heatId),number:i+1}));
+        await fetch('/competitions/{{ comp.pk }}/heats/reorder/', {method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify(d)});
+    }
+    hasChanges=false; exitEditMode();
+}
+
+function cancelEdit() { if(originalOrder) { for(let[k,v] of Object.entries(originalOrder)) { const c=document.querySelector(`.group-block[data-group-id="${k}"] .heats-container`); if(!c)continue; v.forEach(id=>{const card=[...c.querySelectorAll('.heat-card')].find(x=>parseInt(x.dataset.heatId)===id); if(card)c.appendChild(card);}); c.querySelectorAll('.heat-card').forEach((x,i)=>x.querySelector('.heat-number').textContent=i+1); } } hasChanges=false; exitEditMode(); }
+
+async function removeAthlete(id) { if(!confirm('Удалить?'))return; await fetch('/competitions/assignment/'+id+'/remove/',{method:'POST',headers:{'X-CSRFToken':'{{ csrf_token }}'}}); location.reload(); }
+
+async function openAddModal(pk, cat, disc) {
+    const [r1, r2] = await Promise.all([
+        fetch('/competitions/'+pk+'/heats/data/?cat='+cat+'&disc='+disc),
+        fetch('/competitions/'+pk+'/registered/')
+    ]);
+    const heats = await r1.json();
+    const athletes = await r2.json();
+    document.getElementById('modal-heat').innerHTML = heats.map(h=>`<option value="${h.id}">Заплыв ${h.number} (свободно:${h.free})</option>`).join('');
+    document.getElementById('modal-athlete').innerHTML = '<option value="">Выберите...</option>'+athletes.map(a=>`<option value="${a.id}">${a.name} (${a.discipline})</option>`).join('');
+    updateLanes();
+    document.getElementById('add-modal').style.display='flex';
+}
+
+async function updateLanes() {
+    const heatId = document.getElementById('modal-heat').value;
+    if(!heatId)return;
+    const r = await fetch('/competitions/heats/'+heatId+'/data/');
+    const data = await r.json();
+    const taken = data.filter(a=>a.name).map(a=>a.lane);
+    const total = {{ comp.lanes }};
+    document.getElementById('modal-lane').innerHTML = [...Array(total)].map((_,i)=>!taken.includes(i+1)?`<option value="${i+1}">Дорожка ${i+1}</option>`:'').join('');
+}
+
+async function modalAdd() {
+    const userId = document.getElementById('modal-athlete').value;
+    const heatId = document.getElementById('modal-heat').value;
+    const lane = document.getElementById('modal-lane').value;
+    if(!userId||!heatId||!lane){alert('Выберите спортсмена, заплыв и дорожку');return;}
+    const r = await fetch('/competitions/heats/'+heatId+'/add/', {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':'{{ csrf_token }}'},body:'athlete_id='+userId+'&lane='+lane});
+    if(r.ok) location.reload(); else alert('Ошибка');
+}
+</script>
+{% endblock %}

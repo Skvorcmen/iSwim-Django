@@ -1,42 +1,30 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-body p-4">
-                <h2 class="text-center mb-4">Регистрация</h2>
-                <form method="post" action="{% url 'account_signup' %}">
-                    {% csrf_token %}
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    {{ error }}<br>
-                                {% endfor %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    <div class="mb-3">
-                        <label for="id_email" class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" id="id_email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_password1" class="form-label">Пароль</label>
-                        <input type="password" name="password1" class="form-control" id="id_password1" required>
-                        <small class="text-muted">Минимум 8 символов, не только цифры</small>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_password2" class="form-label">Пароль (ещё раз)</label>
-                        <input type="password" name="password2" class="form-control" id="id_password2" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
-                </form>
-                <hr>
-                <p class="text-center">
-                    Уже есть аккаунт? <a href="{% url 'account_login' %}">Войти</a>
-                </p>
+<div class="container" style="max-width:450px;margin:60px auto;">
+    <div class="glass-card" style="padding:40px;">
+        <h2 style="font-weight:700;text-align:center;margin-bottom:24px;">Регистрация</h2>
+        <form method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div style="background:rgba(255,59,48,0.1);color:#ff3b30;padding:12px;border-radius:12px;margin-bottom:16px;">
+                    {% for field in form %}{% for error in field.errors %}{{ error }}<br>{% endfor %}{% endfor %}
+                </div>
+            {% endif %}
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:500;display:block;margin-bottom:6px;">Email</label>
+                <input type="email" name="email" required style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-size:16px;font-family:Inter,sans-serif;">
             </div>
-        </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:500;display:block;margin-bottom:6px;">Пароль</label>
+                <input type="password" name="password1" required style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-size:16px;font-family:Inter,sans-serif;">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:500;display:block;margin-bottom:6px;">Пароль (ещё раз)</label>
+                <input type="password" name="password2" required style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);font-size:16px;font-family:Inter,sans-serif;">
+            </div>
+            <button type="submit" style="width:100%;padding:14px;background:#1a73e8;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">Зарегистрироваться</button>
+        </form>
+        <p style="text-align:center;margin-top:16px;">Уже есть аккаунт? <a href="{% url 'account_login' %}" style="color:#1a73e8;">Войти</a></p>
     </div>
 </div>
 {% endblock %}

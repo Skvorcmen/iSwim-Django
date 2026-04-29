@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div style="max-width:500px;margin:40px auto;padding:0 16px;">
+    <div class="glass-card" style="padding:32px;text-align:center;">
+        <h2 style="font-weight:700;margin-bottom:8px;">Заявка — {{ comp.title }}</h2>
+        <p style="color:#666;margin-bottom:20px;">1. Скачайте шаблон Excel<br>2. Заполните (стили выбираются из списка)<br>3. Загрузите обратно</p>
+        <a href="{% url 'download_template_excel' comp.pk %}" class="btn-glass-outline" style="display:block;margin-bottom:24px;">📥 Скачать шаблон Excel</a>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label style="font-weight:600;display:block;margin-bottom:8px;">📎 Загрузить заполненный файл</label>
+            <input type="file" name="file" accept=".xlsx" required style="margin-bottom:16px;display:block;width:100%;">
+            <button type="submit" class="btn-glass" style="width:100%;">Отправить заявку</button>
+        </form>
+        <p style="margin-top:16px;"><a href="{% url 'competition_detail' comp.pk %}" style="color:#666;">← Назад</a></p>
+    </div>
+</div>
+{% endblock %}

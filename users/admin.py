@@ -26,3 +26,8 @@ class AchievementAdmin(admin.ModelAdmin):
     list_display = ('athlete', 'title', 'achievement_type', 'date')
     list_filter = ('achievement_type',)
     search_fields = ('athlete__user__first_name', 'athlete__user__last_name', 'title')
+from .models import SecretaryProfile
+
+@admin.register(SecretaryProfile)
+class SecretaryProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'phone')
