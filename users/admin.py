@@ -19,3 +19,10 @@ class AthleteProfileAdmin(admin.ModelAdmin):
 class FanProfileAdmin(admin.ModelAdmin):
     list_display = ('user',)
     search_fields = ('user__first_name', 'user__last_name')
+from .models import Achievement
+
+@admin.register(Achievement)
+class AchievementAdmin(admin.ModelAdmin):
+    list_display = ('athlete', 'title', 'achievement_type', 'date')
+    list_filter = ('achievement_type',)
+    search_fields = ('athlete__user__first_name', 'athlete__user__last_name', 'title')

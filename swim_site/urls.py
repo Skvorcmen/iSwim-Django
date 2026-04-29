@@ -51,3 +51,16 @@ urlpatterns += [
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+from activity.views import ActivityListView
+from users.views import WallOfFameView, PublicAthleteView
+
+urlpatterns += [
+    path('activity/', ActivityListView.as_view(), name='activity_list'),
+    path('wall-of-fame/', WallOfFameView.as_view(), name='wall_of_fame'),
+    path('athlete/<str:username>/', PublicAthleteView.as_view(), name='public_athlete'),
+]
+from core.views import search
+
+urlpatterns += [
+    path('search/', search, name='search'),
+]

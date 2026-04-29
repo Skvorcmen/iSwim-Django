@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-card" style="max-width:600px;margin:0 auto;text-align:center;">
+        {% if athlete.user.avatar %}
+            <img src="{{ athlete.user.avatar.url }}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:16px;">
+        {% endif %}
+        <h1 style="font-weight:700;">{{ athlete.user.get_full_name }}</h1>
+        <p style="color:#666;font-size:18px;">{{ athlete.get_swimming_level_display }}</p>
+        <p style="color:#999;">{{ athlete.birth_date|date:"d.m.Y" }} г.р.</p>
+
+        {% if athlete.achievements.all %}
+            <h3 style="font-weight:700;margin-top:24px;">🏆 Достижения</h3>
+            {% for achievement in athlete.achievements.all %}
+                <div style="background:rgba(255,255,255,0.6);border-radius:12px;padding:12px;margin-bottom:8px;">
+                    <strong>{{ achievement.title }}</strong>
+                    {% if achievement.competition %}<p style="color:#666;margin:0;">{{ achievement.competition }}</p>{% endif %}
+                    <small style="color:#999;">{{ achievement.date|date:"d.m.Y" }}</small>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <a href="{% url 'wall_of_fame' %}" style="display:inline-block;margin-top:24px;color:#1a73e8;">← Стена почёта</a>
+    </div>
+</div>
+{% endblock %}

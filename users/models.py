@@ -43,3 +43,26 @@ class FanProfile(models.Model):
     class Meta:
         verbose_name = 'Болельщик'
         verbose_name_plural = 'Болельщики'
+
+class Achievement(models.Model):
+    ACHIEVEMENT_TYPES = [
+        ('record', 'Рекорд школы'),
+        ('medal', 'Медаль'),
+        ('rank', 'Разряд'),
+        ('other', 'Другое'),
+    ]
+    athlete = models.ForeignKey(AthleteProfile, on_delete=models.CASCADE, related_name='achievements', verbose_name='Спортсмен')
+    title = models.CharField(max_length=200, verbose_name='Название')
+    achievement_type = models.CharField(max_length=20, choices=ACHIEVEMENT_TYPES, verbose_name='Тип')
+    description = models.TextField(blank=True, verbose_name='Описание')
+    competition = models.CharField(max_length=200, blank=True, verbose_name='Соревнование')
+    date = models.DateField(verbose_name='Дата')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
+
+    def __str__(self):
+        return f'{self.athlete}: {self.title}'
+
+    class Meta:
+        verbose_name = 'Достижение'
+        verbose_name_plural = 'Достижения'
+        ordering = ['-date']

@@ -1,5 +1,37 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<h1>Школа плавания iSwim</h1>
-<p>Добро пожаловать в школу плавания iSwim! Мы обучаем детей и взрослых плаванию с нуля, готовим профессиональных спортсменов.</p>
+<div class="container" style="margin-top:40px;">
+    {% if activities %}
+    <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 style="font-weight:700;">Лента активности</h2>
+            <a href="{% url 'activity_list' %}" style="color:#1a73e8;">Все события →</a>
+        </div>
+        {% for activity in activities %}
+            <div class="glass-card" style="margin-bottom:8px;padding:16px 24px;display:flex;align-items:center;gap:12px;">
+                <span style="font-size:24px;">
+                    {% if activity.activity_type == 'achievement' %}🏅
+                    {% elif activity.activity_type == 'record' %}⭐
+                    {% elif activity.activity_type == 'competition' %}🏊
+                    {% elif activity.activity_type == 'photo' %}📸
+                    {% else %}📣{% endif %}
+                </span>
+                <div style="flex:1;">
+                    <strong>{{ activity.title }}</strong>
+                    {% if activity.description %}<p style="color:#666;margin:0;">{{ activity.description }}</p>{% endif %}
+                </div>
+                <span style="color:#999;font-size:14px;">{{ activity.created_at|date:"d.m.Y" }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="glass-card" style="text-align:center;padding:48px;">
+        <p style="color:#999;font-size:18px;">Пока нет событий</p>
+    </div>
+    {% endif %}
+
+    <div style="margin-top:40px;text-align:center;">
+        <a href="{% url 'wall_of_fame' %}" class="btn-glass-outline" style="font-size:18px;">🏆 Стена почёта</a>
+    </div>
+</div>
 {% endblock %}

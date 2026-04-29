@@ -3,50 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школа плавания iSwim</title>
+    <title>i.SWiM — школа плавания</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        nav { background: #0077b6; padding: 15px; }
-        nav a { color: white; text-decoration: none; margin-right: 20px; }
-        nav a:hover { text-decoration: underline; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e8f0fe 0%, #d4e4fc 30%, #e0f0ff 60%, #c8ddf8 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1a1a2e;
+            -webkit-font-smoothing: antialiased;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px; right: -200px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(26,115,232,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none; z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -150px; left: -150px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(0,180,216,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none; z-index: 0;
+        }
+        .navbar {
+            position: sticky; top: 20px; z-index: 100;
+            margin: 20px auto; max-width: 1100px;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 20px;
+            padding: 12px 24px;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+        }
+        .navbar-brand {
+            font-size: 24px; font-weight: 700;
+            color: #1a1a2e; text-decoration: none;
+            white-space: nowrap;
+        }
+        .navbar-brand span { color: #1a73e8; }
+        .nav-links {
+            display: flex; gap: 4px; list-style: none;
+            flex-wrap: wrap; margin-left: auto;
+        }
+        .nav-links a {
+            color: #1a1a2e; text-decoration: none;
+            padding: 6px 12px; border-radius: 10px;
+            font-weight: 500; font-size: 13px;
+            white-space: nowrap; transition: all 0.3s;
+        }
+        .nav-links a:hover { background: rgba(26,115,232,0.1); color: #1a73e8; }
+        .search-wrapper {
+            position: relative; flex: 1; max-width: 250px;
+        }
+        .search-wrapper input {
+            width: 100%; padding: 8px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.7);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px; outline: none;
+            transition: all 0.3s;
+        }
+        .search-wrapper input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26,115,232,0.2);
+        }
+        .search-results {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-top: 4px;
+            overflow: hidden;
+            display: none; z-index: 200;
+        }
+        .search-results a {
+            display: block; padding: 10px 16px;
+            text-decoration: none; color: #1a1a2e;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .search-results a:hover { background: rgba(26,115,232,0.05); }
+        .search-results .result-type {
+            font-size: 11px; color: #1a73e8;
+            font-weight: 600;
+        }
+        .btn-glass, .btn-glass-outline {
+            padding: 8px 18px; border-radius: 12px;
+            font-weight: 600; font-size: 13px;
+            cursor: pointer; text-decoration: none;
+            display: inline-block; transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .btn-glass {
+            background: rgba(26,115,232,0.9);
+            color: white; border: none;
+        }
+        .btn-glass:hover { background: #1557b0; }
+        .btn-glass-outline {
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(26,115,232,0.3);
+            color: #1a73e8;
+        }
+        .btn-glass-outline:hover { background: rgba(26,115,232,0.1); }
+        main { position: relative; z-index: 1; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        .glass-card {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 24px; padding: 32px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+        }
+        .page-title { font-size: 36px; font-weight: 700; margin-bottom: 24px; }
+        .footer {
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.8);
+            margin-top: 80px; padding: 40px 0;
+        }
+        .footer a { color: #1a1a2e; text-decoration: none; }
+        .footer a:hover { color: #1a73e8; }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="container">
-            <a href="/">Главная</a>
-            <a href="/news/">Новости</a>
-            <a href="/academy/">Академия</a>
-            <a href="/branches/">Филиалы</a>
-            <a href="/trainers/">Тренеры</a>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">i.<span>SWiM</span></a>
+        <div class="search-wrapper">
+            <input type="text" id="search-input" placeholder="🔍 Поиск..." autocomplete="off">
+            <div class="search-results" id="search-results"></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/wall-of-fame/">🏆 Почёт</a></li>
+            <li><a href="/news/">Новости</a></li>
+            <li><a href="/academy/">Академия</a></li>
+            <li><a href="/branches/">Филиалы</a></li>
+            <li><a href="/trainers/">Тренеры</a></li>
+        </ul>
+        <div style="display:flex;gap:8px;align-items:center;">
             {% if user.is_authenticated %}
-                <a href="/chat/">💬 Чаты <span id="bell-count" style="background:#ff3b30;color:white;padding:2px 7px;border-radius:10px;font-size:11px;display:none;">0</span></a>
-                        <a href="/profile/">Личный кабинет</a>
-                <a href="/accounts/logout/">Выйти</a>
+                <a href="/chat/" class="btn-glass-outline">💬 Чаты <span id="bell-count" style="background:#ff3b30;color:white;padding:2px 7px;border-radius:10px;font-size:11px;display:none;">0</span></a>
+                <a href="/profile/" class="btn-glass-outline">Кабинет</a>
+                <a href="/accounts/logout/" class="btn-glass-outline">Выйти</a>
             {% else %}
-                <a href="/accounts/login/">Войти</a>
-                <a href="/accounts/signup/">Регистрация</a>
+                <a href="/accounts/login/" class="btn-glass-outline">Войти</a>
+                <a href="/accounts/signup/" class="btn-glass">Записаться</a>
             {% endif %}
         </div>
     </nav>
-    <div class="container">
-        {% block content %}{% endblock %}
-    </div>
+    <main>{% block content %}{% endblock %}</main>
+    <footer class="footer">
+        <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+            <div>
+                <h4>i.<span style="color:#1a73e8;">SWiM</span></h4>
+                <p style="color:#666;">Профессиональная школа плавания</p>
+            </div>
+            <div>
+                <a href="/news/" style="display:block;margin-bottom:6px;">Новости</a>
+                <a href="/academy/" style="display:block;margin-bottom:6px;">Академия</a>
+                <a href="/branches/" style="display:block;">Филиалы</a>
+            </div>
+            <div>
+                <p style="color:#666;">+7 (701) 537 88 86</p>
+                <p style="color:#666;">info@iswim.kz</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const q = this.value.trim();
+        if (q.length < 2) { searchResults.style.display = 'none'; return; }
+        searchTimeout = setTimeout(async () => {
+            const r = await fetch('/search/?q=' + encodeURIComponent(q));
+            const d = await r.json();
+            if (d.results.length > 0) {
+                searchResults.innerHTML = d.results.map(item =>
+                    `<a href="${item.url}"><span class="result-type">${item.type}</span><br>${item.name}<br><small style="color:#999;">${item.detail}</small></a>`
+                ).join('');
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div style="padding:12px;color:#999;">Ничего не найдено</div>';
+                searchResults.style.display = 'block';
+            }
+        }, 300);
+    });
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+    {% if user.is_authenticated %}
+    setInterval(async function() {
+        try {
+            const r = await fetch('/chat/api/unread/');
+            const d = await r.json();
+            const bell = document.getElementById('bell-count');
+            if (bell) {
+                bell.textContent = d.count;
+                bell.style.display = d.count > 0 ? 'inline' : 'none';
+            }
+        } catch(e) {}
+    }, 10000);
+    {% endif %}
+    </script>
 </body>
 </html>
-<script>
-setInterval(async function() {
-    {% if user.is_authenticated %}
-    try {
-        const r = await fetch('/chat/api/unread/');
-        const d = await r.json();
-        const bell = document.getElementById('bell-count');
-        if (bell) {
-            bell.textContent = d.count;
-            bell.style.display = d.count > 0 ? 'inline' : 'none';
-        }
-    } catch(e) {}
-    {% endif %}
-}, 10000);
-</script>

@@ -4,15 +4,22 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск">
+    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="+ чаты личные и групповые(админ, тренеры">
+      <change beforePath="$PROJECT_DIR$/.idea/iSwim_Django.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/iSwim_Django.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/branches/templates/branches/branch_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/branches/templates/branches/branch_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/branches/templates/branches/branch_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/branches/templates/branches/branch_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/templates/core/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/swim_site/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/asgi.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/swim_site/manage.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/swim_site/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/swim_site/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainers/templates/trainers/trainer_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/trainers/templates/trainers/trainer_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainers/templates/trainers/trainer_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/trainers/templates/trainers/trainer_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,24 +54,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;advanced.settings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.fileTypes",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -131,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777380927049</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="+ чаты личные и групповые(админ, тренеры">
+      <option name="closed" value="true" />
+      <created>1777442035137</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1777442035137</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -143,6 +158,7 @@
     <MESSAGE value="подготовили примитивные модели" />
     <MESSAGE value="создал админки для тренеров, новостей, филиалов" />
     <MESSAGE value="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск" />
-    <option name="LAST_COMMIT_MESSAGE" value="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск" />
+    <MESSAGE value="+ чаты личные и групповые(админ, тренеры" />
+    <option name="LAST_COMMIT_MESSAGE" value="+ чаты личные и групповые(админ, тренеры" />
   </component>
 </project>

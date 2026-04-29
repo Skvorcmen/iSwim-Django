@@ -35,3 +35,32 @@ class TrainerProfileView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['trainer'] = self.request.user.trainer_profile
         return context
+from django.views.generic import ListView, DetailView
+from .models import AthleteProfile, Achievement
+from django.db.models import Count, Q
+
+class WallOfFameView(ListView):
+    template_name = 'users/wall_of_fame.html'
+    context_object_name = 'athletes'
+
+    def get_queryset(self):
+        return AthleteProfile.objects.annotate(
+            achievement_count=Count('achievements')
+        ).filter(achievement_count__gt=0).order_by('-achievement_count')[:20]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['records'] = Achievement.objects.filter(achievement_type='record').order_by('-date')[:10]
+        return context
+
+class PublicAthleteView(DetailView):
+    model = AthleteProfile
+    template_name = 'users/public_athlete.html'
+    context_object_name = 'athlete'
+    slug_field = 'user__username'
+    slug_url_kwarg = 'username'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['achievements'] = self.object.achievements.all()
+        return context

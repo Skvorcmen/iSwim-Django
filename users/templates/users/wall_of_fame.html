@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="page-title">🏆 Стена почёта</h1>
+
+    <h2 style="font-weight:700;margin-bottom:16px;">⭐ Рекорды школы</h2>
+    <div class="grid-3">
+        {% for record in records %}
+            <div class="glass-card">
+                <div style="font-weight:700;font-size:18px;">{{ record.title }}</div>
+                <p style="color:#666;">{{ record.athlete.user.get_full_name }}</p>
+                {% if record.competition %}<p style="color:#999;font-size:14px;">{{ record.competition }}</p>{% endif %}
+                <span style="color:#1a73e8;font-weight:600;">{{ record.date|date:"d.m.Y" }}</span>
+            </div>
+        {% empty %}
+            <p style="color:#999;">Рекордов пока нет</p>
+        {% endfor %}
+    </div>
+
+    <h2 style="font-weight:700;margin:32px 0 16px;">🏅 Лучшие спортсмены</h2>
+    <div class="grid-3">
+        {% for athlete in athletes %}
+            <a href="{% url 'public_athlete' athlete.user.username %}" style="text-decoration:none;color:inherit;">
+                <div class="glass-card">
+                    {% if athlete.user.avatar %}
+                        <img src="{{ athlete.user.avatar.url }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:12px;">
+                    {% endif %}
+                    <h3 style="font-weight:700;">{{ athlete.user.get_full_name }}</h3>
+                    <p style="color:#666;">{{ athlete.get_swimming_level_display }}</p>
+                    <span style="color:#1a73e8;font-weight:600;">🏅 {{ athlete.achievement_count }} достижений</span>
+                </div>
+            </a>
+        {% empty %}
+            <p style="color:#999;">Спортсменов пока нет</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

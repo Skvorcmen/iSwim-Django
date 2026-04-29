@@ -1,14 +1,21 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<h1>{{ trainer.user.get_full_name }}</h1>
-{% if trainer.photo %}<img src="{{ trainer.photo.url }}" style="max-width: 300px;">{% endif %}
-<p><strong>Специализация:</strong> {{ trainer.specialization }}</p>
-<p><strong>Стаж:</strong> {{ trainer.experience_years }} лет</p>
-<p>{{ trainer.bio }}</p>
+<div class="container">
+    <div class="glass-card" style="max-width:600px;margin:0 auto;text-align:center;">
+        {% if trainer.photo %}
+            <img src="{{ trainer.photo.url }}" style="width:140px;height:140px;border-radius:50%;object-fit:cover;margin-bottom:16px;">
+        {% endif %}
+        <h1 style="font-weight:700;margin-bottom:8px;">{{ trainer.user.get_full_name }}</h1>
+        <p style="color:#666;font-size:18px;margin-bottom:4px;">{{ trainer.specialization }}</p>
+        <p style="color:#999;margin-bottom:16px;">Стаж: {{ trainer.experience_years }} лет</p>
+        <p style="color:#333;line-height:1.6;margin-bottom:24px;">{{ trainer.bio }}</p>
 
-<h2>Филиалы</h2>
-{% for branch in trainer.branches.all %}
-    <p><a href="{% url 'branch_detail' branch.pk %}">{{ branch.name }}</a></p>
-{% endfor %}
-<p><a href="{% url 'trainer_list' %}">← Все тренеры</a></p>
+        <h3 style="font-weight:700;margin-bottom:12px;">Филиалы</h3>
+        {% for branch in trainer.branches.all %}
+            <a href="{% url 'branch_detail' branch.pk %}" style="color:#1a73e8;">{{ branch.name }}</a>{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+
+        <p style="margin-top:24px;"><a href="{% url 'trainer_list' %}" style="color:#1a73e8;">← Все тренеры</a></p>
+    </div>
+</div>
 {% endblock %}

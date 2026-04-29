@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Лента активности</h1>
+    {% for activity in activities %}
+        <div class="glass-card" style="margin-bottom:8px;padding:16px 24px;display:flex;align-items:center;gap:12px;">
+            <span style="font-size:24px;">
+                {% if activity.activity_type == 'achievement' %}🏅
+                {% elif activity.activity_type == 'record' %}⭐
+                {% elif activity.activity_type == 'competition' %}🏊
+                {% elif activity.activity_type == 'photo' %}📸
+                {% else %}📣{% endif %}
+            </span>
+            <div style="flex:1;">
+                <strong>{{ activity.title }}</strong>
+                {% if activity.description %}<p style="color:#666;margin:0;">{{ activity.description }}</p>{% endif %}
+                <small style="color:#999;">{{ activity.user.get_full_name }} · {{ activity.created_at|date:"d.m.Y H:i" }}</small>
+            </div>
+        </div>
+    {% empty %}
+        <p style="color:#999;">Событий пока нет</p>
+    {% endfor %}
+</div>
+{% endblock %}

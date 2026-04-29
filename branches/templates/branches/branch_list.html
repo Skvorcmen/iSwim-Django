@@ -1,13 +1,21 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<h1>Наши филиалы</h1>
-{% for branch in branches %}
-    <div style="margin-bottom: 30px;">
-        <h2><a href="{% url 'branch_detail' branch.pk %}">{{ branch.name }}</a></h2>
-        {% if branch.photo %}<img src="{{ branch.photo.url }}" style="max-width: 300px;">{% endif %}
-        <p>{{ branch.address }}</p>
-        <p>{{ branch.phone }}</p>
-        <p>{{ branch.schedule }}</p>
+<div class="container">
+    <h1 class="page-title">Наши филиалы</h1>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;">
+        {% for branch in branches %}
+            <a href="{% url 'branch_detail' branch.pk %}" style="text-decoration:none;color:inherit;">
+                <div class="glass-card" style="height:100%;">
+                    {% if branch.photo %}
+                        <img src="{{ branch.photo.url }}" style="width:100%;height:200px;object-fit:cover;border-radius:16px;margin-bottom:16px;">
+                    {% endif %}
+                    <h2 style="font-weight:700;margin-bottom:8px;">{{ branch.name }}</h2>
+                    <p style="color:#666;margin-bottom:4px;">📍 {{ branch.address }}</p>
+                    <p style="color:#666;margin-bottom:4px;">📞 {{ branch.phone }}</p>
+                    <p style="color:#999;font-size:13px;">🕐 {{ branch.schedule|truncatechars:60 }}</p>
+                </div>
+            </a>
+        {% endfor %}
     </div>
-{% endfor %}
+</div>
 {% endblock %}

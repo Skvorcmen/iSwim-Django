@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'academy',
     'branches',
     'trainers',
+    'activity',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
