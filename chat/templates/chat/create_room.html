@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-card" style="max-width:500px;margin:0 auto;">
+        <h2 style="margin-bottom:20px;">Новый чат</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:500;">Название чата</label>
+                <input type="text" name="name" required style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);margin-top:6px;">
+            </div>
+            {% if can_create_group %}
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:500;">Тип</label>
+                <select name="room_type" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);margin-top:6px;">
+                    <option value="private">Личный</option>
+                    <option value="group">Групповой</option>
+                </select>
+            </div>
+            {% endif %}
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:500;">Участники</label>
+                <input type="text" id="user-search" placeholder="Поиск по имени..." style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.7);margin-top:6px;margin-bottom:8px;">
+                <div id="search-results" style="max-height:200px;overflow-y:auto;"></div>
+                <div id="selected-users" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+            </div>
+            <div id="hidden-inputs"></div>
+            <button type="submit" class="btn-glass" style="width:100%;">Создать чат</button>
+        </form>
+    </div>
+</div>
+
+<script>
+let selectedUsers = [];
+document.getElementById('user-search').addEventListener('input', async function() {
+    const q = this.value;
+    if (q.length < 2) { document.getElementById('search-results').innerHTML = ''; return; }
+    const r = await fetch('{% url "chat_users_api" %}?search=' + q);
+    const d = await r.json();
+    const div = document.getElementById('search-results');
+    div.innerHTML = d.users.map(u =>
+        `<div onclick="addUser(${u.id},'${u.name}')" style="padding:8px 12px;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='rgba(26,115,232,0.1)'" onmouseout="this.style.background='transparent'">${u.name}</div>`
+    ).join('');
+});
+
+function addUser(id, name) {
+    if (!selectedUsers.find(u => u.id === id)) {
+        selectedUsers.push({id, name});
+        renderSelected();
+    }
+    document.getElementById('search-results').innerHTML = '';
+    document.getElementById('user-search').value = '';
+}
+
+function removeUser(id) {
+    selectedUsers = selectedUsers.filter(u => u.id !== id);
+    renderSelected();
+}
+
+function renderSelected() {
+    document.getElementById('selected-users').innerHTML = selectedUsers.map(u =>
+        `<span style="background:rgba(26,115,232,0.1);padding:6px 12px;border-radius:20px;font-size:14px;display:flex;align-items:center;gap:6px;">${u.name} <span onclick="removeUser(${u.id})" style="cursor:pointer;">×</span></span>`
+    ).join('');
+    document.getElementById('hidden-inputs').innerHTML = selectedUsers.map(u =>
+        `<input type="hidden" name="participants" value="${u.id}">`
+    ).join('');
+}
+</script>
+{% endblock %}

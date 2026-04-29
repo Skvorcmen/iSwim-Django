@@ -21,7 +21,8 @@
             <a href="/branches/">Филиалы</a>
             <a href="/trainers/">Тренеры</a>
             {% if user.is_authenticated %}
-                <a href="/profile/">Личный кабинет</a>
+                <a href="/chat/">💬 Чаты <span id="bell-count" style="background:#ff3b30;color:white;padding:2px 7px;border-radius:10px;font-size:11px;display:none;">0</span></a>
+                        <a href="/profile/">Личный кабинет</a>
                 <a href="/accounts/logout/">Выйти</a>
             {% else %}
                 <a href="/accounts/login/">Войти</a>
@@ -34,3 +35,18 @@
     </div>
 </body>
 </html>
+<script>
+setInterval(async function() {
+    {% if user.is_authenticated %}
+    try {
+        const r = await fetch('/chat/api/unread/');
+        const d = await r.json();
+        const bell = document.getElementById('bell-count');
+        if (bell) {
+            bell.textContent = d.count;
+            bell.style.display = d.count > 0 ? 'inline' : 'none';
+        }
+    } catch(e) {}
+    {% endif %}
+}, 10000);
+</script>
