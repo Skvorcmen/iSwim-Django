@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Календарь соревнований</h1>
+
+    <div style="display:flex;gap:8px;margin-bottom:24px;">
+        <a href="{% url 'competition_list' %}" class="btn-glass-outline">Все</a>
+        <a href="?status=upcoming" class="btn-glass-outline">Предстоящие</a>
+        <a href="?status=ongoing" class="btn-glass-outline">Текущие</a>
+        <a href="?status=finished" class="btn-glass-outline">Завершённые</a>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;">
+        {% for comp in competitions %}
+            <a href="{% url 'competition_detail' comp.pk %}" style="text-decoration:none;color:inherit;">
+                <div class="glass-card" style="height:100%;">
+                    <span style="font-size:12px;font-weight:600;color:#1a73e8;">
+                        {% if comp.status == 'upcoming' %}🟢 Предстоит
+                        {% elif comp.status == 'ongoing' %}🔴 Идёт сейчас
+                        {% elif comp.status == 'finished' %}✅ Завершено
+                        {% else %}❌ Отменено{% endif %}
+                    </span>
+                    <h3 style="font-weight:700;margin:8px 0;">{{ comp.title }}</h3>
+                    <p style="color:#666;">📍 {{ comp.location }}</p>
+                    <p style="color:#666;">📅 {{ comp.start_date|date:"d.m.Y" }}{% if comp.end_date %} – {{ comp.end_date|date:"d.m.Y" }}{% endif %}</p>
+                    <p style="color:#999;">👤 Заявок: {{ comp.registered_count }}</p>
+                </div>
+            </a>
+        {% empty %}
+            <p style="color:#999;">Соревнований пока нет</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

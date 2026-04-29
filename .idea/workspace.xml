@@ -4,22 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="+ чаты личные и групповые(админ, тренеры">
-      <change beforePath="$PROJECT_DIR$/.idea/iSwim_Django.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/iSwim_Django.iml" afterDir="false" />
+    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="добавил поиск пользователей">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/branches/templates/branches/branch_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/branches/templates/branches/branch_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/branches/templates/branches/branch_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/branches/templates/branches/branch_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/templates/core/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/templates/core/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/swim_site/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/swim_site/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trainers/templates/trainers/trainer_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/trainers/templates/trainers/trainer_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trainers/templates/trainers/trainer_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/trainers/templates/trainers/trainer_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +60,11 @@
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.fileTypes",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
+    ]
   }
 }]]></component>
   <component name="SharedIndexes">
@@ -146,7 +141,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777442035137</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="добавил поиск пользователей">
+      <option name="closed" value="true" />
+      <created>1777443384496</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1777443384496</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -159,6 +162,7 @@
     <MESSAGE value="создал админки для тренеров, новостей, филиалов" />
     <MESSAGE value="создал пользователей для теста, допилил новости и академию - коменты лайки фильтр поиск" />
     <MESSAGE value="+ чаты личные и групповые(админ, тренеры" />
-    <option name="LAST_COMMIT_MESSAGE" value="+ чаты личные и групповые(админ, тренеры" />
+    <MESSAGE value="добавил поиск пользователей" />
+    <option name="LAST_COMMIT_MESSAGE" value="добавил поиск пользователей" />
   </component>
 </project>

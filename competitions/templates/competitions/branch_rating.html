@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="page-title">🏆 Командный зачёт филиалов</h1>
+    <div class="glass-card" style="max-width:600px;margin:0 auto;">
+        {% for score in scores %}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;{% if not forloop.last %}border-bottom:1px solid rgba(0,0,0,0.05);{% endif %}">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:24px;font-weight:700;color:#1a73e8;">{{ forloop.counter }}</span>
+                    <strong>{{ score.branch__name }}</strong>
+                </div>
+                <div style="text-align:right;">
+                    <div>🥇{{ score.gold }} 🥈{{ score.silver }} 🥉{{ score.bronze }}</div>
+                    <div style="font-size:18px;font-weight:700;color:#1a73e8;">{{ score.total }} очков</div>
+                </div>
+            </div>
+        {% empty %}
+            <p style="color:#999;">Данных пока нет</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

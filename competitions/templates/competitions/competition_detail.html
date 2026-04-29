@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-card" style="max-width:800px;margin:0 auto;">
+        <span style="font-size:14px;font-weight:600;color:#1a73e8;">
+            {% if comp.status == 'upcoming' %}🟢 Предстоит
+            {% elif comp.status == 'ongoing' %}🔴 Идёт сейчас
+            {% elif comp.status == 'finished' %}✅ Завершено
+            {% else %}❌ Отменено{% endif %}
+        </span>
+        <h1 style="font-weight:700;margin:8px 0;">{{ comp.title }}</h1>
+        <p style="color:#666;">📍 {{ comp.location }}</p>
+        <p style="color:#666;">📅 {{ comp.start_date|date:"d.m.Y" }}{% if comp.end_date %} – {{ comp.end_date|date:"d.m.Y" }}{% endif %}</p>
+        {% if comp.registration_deadline %}<p style="color:#666;">⏰ Дедлайн заявок: {{ comp.registration_deadline|date:"d.m.Y" }}</p>{% endif %}
+        {% if comp.description %}<p style="margin:16px 0;">{{ comp.description }}</p>{% endif %}
+        {% if comp.program %}<p style="margin:16px 0;"><strong>Программа:</strong> {{ comp.program }}</p>{% endif %}
+
+        {% if comp.status == 'upcoming' and user.is_authenticated and user.athlete_profile %}
+            {% if is_registered %}
+                <a href="{% url 'unregister_competition' comp.pk %}" class="btn-glass-outline" style="margin-top:16px;">Отменить заявку</a>
+            {% else %}
+                <a href="{% url 'register_competition' comp.pk %}" class="btn-glass" style="margin-top:16px;">Я участвую!</a>
+            {% endif %}
+        {% endif %}
+
+        {% if registrations %}
+            <h2 style="font-weight:700;margin-top:24px;">Заявленные участники ({{ registrations.count }})</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+                {% for reg in registrations %}
+                    <a href="{% url 'public_athlete' reg.athlete.user.username %}" style="text-decoration:none;">
+                        <div style="background:rgba(255,255,255,0.5);padding:8px 14px;border-radius:20px;font-size:14px;">
+                            {{ reg.athlete.user.get_full_name }}
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if results %}
+            <h2 style="font-weight:700;margin-top:24px;">Результаты</h2>
+            {% regroup results by discipline as discipline_list %}
+            {% for discipline in discipline_list %}
+                <h3 style="margin-top:16px;">🏊 {{ discipline.grouper }}</h3>
+                {% for result in discipline.list %}
+                    <div style="background:rgba(255,255,255,0.5);padding:12px;border-radius:12px;margin-bottom:4px;display:flex;justify-content:space-between;">
+                        <span>
+                            {% if result.place == 1 %}🥇{% elif result.place == 2 %}🥈{% elif result.place == 3 %}🥉{% else %}{{ result.place }}{% endif %}
+                            {{ result.athlete.user.get_full_name }}
+                        </span>
+                        <span style="color:#1a73e8;font-weight:600;">{{ result.result_time }}</span>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        {% if branch_scores %}
+            <h2 style="font-weight:700;margin-top:24px;">Командный зачёт</h2>
+            {% for score in branch_scores %}
+                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.05);">
+                    <span>{{ score.branch.name }}</span>
+                    <span>🥇{{ score.gold }} 🥈{{ score.silver }} 🥉{{ score.bronze }} — {{ score.total_points }} очков</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <p style="margin-top:24px;"><a href="{% url 'competition_list' %}" style="color:#1a73e8;">← Все соревнования</a></p>
+    </div>
+</div>
+{% endblock %}

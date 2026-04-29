@@ -64,3 +64,12 @@ from core.views import search
 urlpatterns += [
     path('search/', search, name='search'),
 ]
+from competitions.views import CompetitionListView, CompetitionDetailView, register_for_competition, unregister_from_competition, BranchRatingView
+
+urlpatterns += [
+    path('competitions/', CompetitionListView.as_view(), name='competition_list'),
+    path('competitions/<int:pk>/', CompetitionDetailView.as_view(), name='competition_detail'),
+    path('competitions/<int:pk>/register/', register_for_competition, name='register_competition'),
+    path('competitions/<int:pk>/unregister/', unregister_from_competition, name='unregister_competition'),
+    path('rating/', BranchRatingView.as_view(), name='branch_rating'),
+]
