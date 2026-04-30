@@ -62,13 +62,11 @@ class CompetitionDetailView(DetailView):
         ctx['age_categories'] = self.object.age_categories.all()
         return ctx
 
-class CompetitionCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class CompetitionCreateView(LoginRequiredMixin, CreateView):
     model = Competition
     template_name = 'competitions/competition_form.html'
     fields = ['title', 'description', 'location', 'branch', 'start_date', 'end_date',
               'registration_deadline', 'lanes', 'regulation', 'image']
-    def test_func(self):
-        return is_secretary(self.request.user)
     def get_success_url(self):
         return reverse_lazy('competition_detail', kwargs={'pk': self.object.pk})
     def form_valid(self, form):
@@ -247,30 +245,33 @@ def generate_heats(request, pk):
                     if i < len(lane_order):
                         HeatAssignment.objects.create(heat=heat, registration=reg, lane=lane_order[i] + 1)
     messages.success(request, 'Заплывы сформированы!')
-    return redirect('manage_heats', pk=pk)
+    return redirect('live_competition', pk=pk)
 
-@user_passes_test(is_secretary)
-def manage_heats(request, pk):
-    comp = get_object_or_404(Competition, pk=pk)
+
+def get_grouped_heats(comp):
     heats = comp.heats.all().order_by(
         'age_category__birth_year_from', 'age_category__gender',
         'discipline__style', 'discipline__distance', 'number'
     )
     groups = []
     current_key = None
-    current_group = None
     for h in heats:
         key = (h.age_category.id, h.discipline.id)
         if key != current_key:
             current_key = key
-            current_group = {
+            groups.append({
                 'category': h.age_category,
                 'discipline': h.discipline,
                 'comp': comp,
                 'heats': []
-            }
-            groups.append(current_group)
-        current_group['heats'].append(h)
+            })
+        groups[-1]['heats'].append(h)
+    return groups
+
+@user_passes_test(is_secretary)
+def manage_heats(request, pk):
+    comp = get_object_or_404(Competition, pk=pk)
+    groups = get_grouped_heats(comp)
     return render(request, 'competitions/manage_heats.html', {'comp': comp, 'groups': groups})
 
 @user_passes_test(is_secretary)
@@ -300,14 +301,12 @@ def add_to_heat(request, heat_id):
             return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
-class LiveCompetitionView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class LiveCompetitionView(LoginRequiredMixin, TemplateView):
     template_name = 'competitions/live_competition.html'
-    def test_func(self):
-        return is_secretary(self.request.user)
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['comp'] = get_object_or_404(Competition, pk=self.kwargs['pk'])
-        ctx['heats'] = ctx['comp'].heats.all().order_by('age_category__birth_year_from', 'age_category__gender', 'discipline__style', 'discipline__distance', 'number')
+        ctx['groups'] = get_grouped_heats(ctx['comp'])  # ('age_category__birth_year_from', 'age_category__gender', 'discipline__style', 'discipline__distance', 'number')
         return ctx
 
 @user_passes_test(is_secretary)
@@ -370,7 +369,7 @@ def finalize_results(request, pk, discipline_id, category_id):
     dnf.update(place=None)
     
     messages.success(request, 'Результаты финализированы! Места распределены.')
-    return redirect('manage_heats', pk=pk)
+    return redirect('live_competition', pk=pk)
 
 @user_passes_test(is_secretary)
 def reorder_heats(request, pk):
@@ -398,7 +397,7 @@ def group_heats_data(request, pk):
     data = []
     for h in heats:
         taken = h.assignments.count()
-        free = 6 - taken  # TODO: брать из comp.lanes
+        free = h.competition.lanes - taken  # TODO: брать из comp.lanes
         data.append({'id': h.id, 'number': h.number, 'taken': taken, 'free': free})
     return JsonResponse(data, safe=False)
 
@@ -409,3 +408,67 @@ def registered_athletes(request, pk):
         regs = regs.filter(Q(athlete__user__first_name__icontains=q) | Q(athlete__user__last_name__icontains=q))
     data = [{'id': r.athlete.id, 'name': r.athlete.user.get_full_name(), 'discipline': str(r.discipline)} for r in regs[:100]]
     return JsonResponse(data, safe=False)
+
+@user_passes_test(is_secretary)
+def finish_competition(request, pk):
+    comp = get_object_or_404(Competition, pk=pk)
+    comp.status = 'finished'
+    comp.save()
+    
+    from activity.models import Activity
+    from users.models import Achievement
+    
+    # Собираем победителей по каждой дисциплине
+    for heat in comp.heats.all():
+        for assignment in heat.assignments.filter(place__lte=3):
+            athlete = assignment.registration.athlete
+            place = assignment.place
+            medal = {1: '🥇', 2: '🥈', 3: '🥉'}.get(place, '')
+            
+            # Запись в ленту активности
+            Activity.objects.create(
+                user=athlete.user,
+                activity_type='achievement',
+                title=f'{athlete.user.get_full_name()} занял {place} место',
+                description=f'{heat.discipline.get_style_display()} {heat.discipline.distance}м — {comp.title}',
+                link=f'/athlete/{athlete.user.username}/'
+            )
+            
+            # Создаём достижение
+            Achievement.objects.create(
+                athlete=athlete,
+                title=f'{medal} {place} место — {heat.discipline.get_style_display()} {heat.discipline.distance}м',
+                achievement_type='medal',
+                description=f'{comp.title} ({comp.start_date})',
+                competition=comp.title,
+                date=comp.start_date
+            )
+            
+            # Проверка рекорда школы
+            existing_record = Achievement.objects.filter(
+                athlete=athlete,
+                achievement_type='record',
+                title__contains=heat.discipline.get_style_display()
+            ).first()
+            
+            if not existing_record:
+                # Если нет рекорда — создаём
+                Achievement.objects.create(
+                    athlete=athlete,
+                    title=f'⭐ Рекорд школы — {heat.discipline.get_style_display()} {heat.discipline.distance}м',
+                    achievement_type='record',
+                    description=f'{assignment.result_time} — {comp.title}',
+                    date=comp.start_date
+                )
+    
+    # Общая запись в ленту
+    Activity.objects.create(
+        user=request.user,
+        activity_type='competition',
+        title=f'Соревнование «{comp.title}» завершено!',
+        description=f'Поздравляем всех участников и победителей!',
+        link=f'/competitions/{comp.pk}/results/'
+    )
+    
+    messages.success(request, 'Соревнование завершено! Результаты опубликованы.')
+    return redirect('live_competition', pk=pk)

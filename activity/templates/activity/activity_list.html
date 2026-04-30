@@ -1,24 +1,46 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="container">
+<div class="container" style="max-width:700px;">
     <h1 class="page-title">Лента активности</h1>
+
     {% for activity in activities %}
-        <div class="glass-card" style="margin-bottom:8px;padding:16px 24px;display:flex;align-items:center;gap:12px;">
-            <span style="font-size:24px;">
-                {% if activity.activity_type == 'achievement' %}🏅
-                {% elif activity.activity_type == 'record' %}⭐
-                {% elif activity.activity_type == 'competition' %}🏊
-                {% elif activity.activity_type == 'photo' %}📸
-                {% else %}📣{% endif %}
-            </span>
-            <div style="flex:1;">
-                <strong>{{ activity.title }}</strong>
-                {% if activity.description %}<p style="color:#666;margin:0;">{{ activity.description }}</p>{% endif %}
-                <small style="color:#999;">{{ activity.user.get_full_name }} · {{ activity.created_at|date:"d.m.Y H:i" }}</small>
+        <div class="glass-card" style="margin-bottom:16px;padding:20px 24px;">
+            <div style="display:flex;gap:12px;">
+                <div style="font-size:32px;width:40px;flex-shrink:0;text-align:center;">
+                    {% if activity.activity_type == 'achievement' %}🏅
+                    {% elif activity.activity_type == 'record' %}⭐
+                    {% elif activity.activity_type == 'competition' %}🏁
+                    {% else %}📣{% endif %}
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <h3 style="font-weight:700;font-size:17px;margin:0 0 6px;">{{ activity.title }}</h3>
+                    
+                    {% if activity.description %}
+                        <div style="color:#444;font-size:14px;line-height:1.5;">
+                            {% for line in activity.description.splitlines %}
+                                {% if '|' in line %}
+                                    <span style="font-family:monospace;font-size:13px;color:#666;">{{ line }}</span>
+                                {% elif line|length > 0 %}
+                                    {{ line }}
+                                {% endif %}
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div style="margin-top:8px;display:flex;align-items:center;gap:12px;">
+                        <span style="font-size:12px;color:#999;">{{ activity.created_at|date:"d.m.Y H:i" }}</span>
+                        {% if activity.link %}
+                            <a href="{{ activity.link }}" style="font-size:13px;color:#1a73e8;text-decoration:none;font-weight:500;">Подробнее →</a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     {% empty %}
-        <p style="color:#999;">Событий пока нет</p>
+        <div class="glass-card" style="text-align:center;padding:48px;">
+            <p style="color:#999;font-size:16px;">Событий пока нет</p>
+        </div>
     {% endfor %}
 </div>
 {% endblock %}

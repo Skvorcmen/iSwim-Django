@@ -4,20 +4,19 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="добавил страницу соревнований">
+    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="реализована подача заявок, сортировка по группам, по заплывам, сейчас обработка заплывов - тестировать нужно">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/competitions/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/competitions/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activity/templates/activity/activity_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/activity/templates/activity/activity_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/competition_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/competition_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/competition_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/competition_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/live_competition.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/live_competition.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/manage_heats.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/manage_heats.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/competitions/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/swim_site/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/account/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/account/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/signup.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/templates/users/athlete_profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/users/templates/users/athlete_profile.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users/templates/users/trainer_profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/users/templates/users/trainer_profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,6 +179,7 @@
     <MESSAGE value="+ чаты личные и групповые(админ, тренеры" />
     <MESSAGE value="добавил поиск пользователей" />
     <MESSAGE value="добавил страницу соревнований" />
-    <option name="LAST_COMMIT_MESSAGE" value="добавил страницу соревнований" />
+    <MESSAGE value="реализована подача заявок, сортировка по группам, по заплывам, сейчас обработка заплывов - тестировать нужно" />
+    <option name="LAST_COMMIT_MESSAGE" value="реализована подача заявок, сортировка по группам, по заплывам, сейчас обработка заплывов - тестировать нужно" />
   </component>
 </project>

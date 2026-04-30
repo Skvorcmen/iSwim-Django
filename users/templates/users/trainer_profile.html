@@ -8,6 +8,7 @@
         <h1 style="font-weight:700;margin-bottom:4px;">{{ user.get_full_name }}</h1>
         <p style="color:#666;font-size:16px;">{{ trainer.specialization }}</p>
         <p style="color:#999;">Стаж: {{ trainer.experience_years }} лет</p>
+            <a href="{% url 'edit_profile' %}" class="btn-glass-outline" style="font-size:12px;">✏️ Редактировать</a>
         <div style="margin-top:12px;">
             {% for branch in trainer.branches.all %}
                 <span style="background:rgba(26,115,232,0.1);padding:4px 12px;border-radius:20px;font-size:13px;">{{ branch.name }}</span>

@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container" style="max-width:500px;">
+    <div class="glass-card">
+        <h2 style="font-weight:700;margin-bottom:20px;">Редактировать профиль</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <div style="flex:1;"><label>Имя</label><input name="first_name" value="{{ user.first_name }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+                <div style="flex:1;"><label>Фамилия</label><input name="last_name" value="{{ user.last_name }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+            </div>
+            <div style="margin-bottom:12px;"><label>Телефон</label><input name="phone" value="{{ user.phone }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+            <div style="margin-bottom:12px;"><label>Аватар</label>
+                {% if user.avatar %}<img src="{{ user.avatar.url }}" style="width:60px;height:60px;border-radius:50%;display:block;margin:8px 0;">{% endif %}
+                <input type="file" name="avatar" style="width:100%;">
+            </div>
+            {% if user.trainer_profile %}
+                <div style="margin-bottom:12px;"><label>Специализация</label><input name="specialization" value="{{ user.trainer_profile.specialization }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+                <div style="margin-bottom:12px;"><label>О себе</label><textarea name="bio" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">{{ user.trainer_profile.bio }}</textarea></div>
+            {% endif %}
+            {% if user.athlete_profile %}
+                <div style="margin-bottom:12px;"><label>Медицинские заметки</label><textarea name="medical_notes" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">{{ user.athlete_profile.medical_notes }}</textarea></div>
+            {% endif %}
+            <button type="submit" class="btn-glass" style="width:100%;">Сохранить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

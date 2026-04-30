@@ -1,15 +1,37 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<h1>Личный кабинет спортсмена</h1>
-<p><strong>Имя:</strong> {{ user.get_full_name }}</p>
-<p><strong>Дата рождения:</strong> {{ profile.birth_date }}</p>
-<p><strong>Уровень:</strong> {{ profile.get_swimming_level_display }}</p>
-<p><strong>Телефон:</strong> {{ user.phone }}</p>
-{% if profile.medical_notes %}<p><strong>Мед. заметки:</strong> {{ profile.medical_notes }}</p>{% endif %}
+<div class="container" style="max-width:600px;">
+    <div class="glass-card" style="text-align:center;margin-bottom:20px;">
+        {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin-bottom:12px;">
+        {% endif %}
+        <h1 style="font-weight:700;margin-bottom:4px;">{{ user.get_full_name }}</h1>
+        <p style="color:#666;">{{ profile.get_swimming_level_display }}</p>
+            <a href="{% url 'edit_profile' %}" class="btn-glass-outline" style="font-size:12px;">✏️ Редактировать</a>
+        <p style="color:#999;">{{ profile.birth_date|date:"d.m.Y" }}</p>
+    </div>
 
-<h2>Мои тренировки</h2>
-<p>Расписание тренировок появится здесь</p>
+    <div class="glass-card" style="margin-bottom:20px;">
+        <h3 style="font-weight:700;margin-bottom:12px;">🏆 Мои достижения</h3>
+        {% with achievements=profile.achievements.all %}
+            {% if achievements %}
+                {% for a in achievements %}
+                    <div style="padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.05);">
+                        <strong>{{ a.title }}</strong>
+                        <span style="color:#999;font-size:13px;margin-left:8px;">{{ a.date|date:"d.m.Y" }}</span>
+                        {% if a.competition %}<p style="color:#666;margin:0;font-size:14px;">{{ a.competition }}</p>{% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color:#999;">Достижений пока нет</p>
+            {% endif %}
+        {% endwith %}
+    </div>
 
-<h2>Мой прогресс</h2>
-<p>Статистика и нормативы появятся здесь</p>
+    <div class="glass-card">
+        <h3 style="font-weight:700;margin-bottom:12px;">📊 Контакты</h3>
+        <p>{{ user.phone|default:"Не указан" }}</p>
+        {% if profile.medical_notes %}<p style="color:#666;">{{ profile.medical_notes }}</p>{% endif %}
+    </div>
+</div>
 {% endblock %}

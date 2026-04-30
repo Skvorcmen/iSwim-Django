@@ -7,14 +7,20 @@
             <span style="color:#1a73e8;font-weight:600;">{{ comp.get_status_display }}</span>
         </div>
         <a href="{% url 'competition_detail' comp.pk %}" class="btn-glass-outline">← Назад</a>
+            <a href="{% url 'finish_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;font-size:13px;" onclick="return confirm('Завершить соревнование? Все результаты будут финализированы.'")">🏁 Завершить соревнование</a>
     </div>
 
     {% for group in groups %}
     <div style="margin-bottom:24px;">
-        <div style="padding:12px 16px;background:rgba(26,115,232,0.05);border-radius:12px;margin-bottom:8px;">
+        <div style="padding:12px 16px;background:rgba(26,115,232,0.05);border-radius:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
             <h3 style="font-weight:700;color:#1a73e8;margin:0;font-size:18px;">
                 {{ group.category.name }} ({{ group.category.get_gender_display }}) — {{ group.discipline.get_style_display }} {{ group.discipline.distance }}м
             </h3>
+            <a href="{% url 'finalize_results' comp.pk group.discipline.id group.category.id %}"
+               style="background:#27ae60;color:white;padding:8px 18px;border-radius:10px;font-size:13px;text-decoration:none;font-weight:600;"
+               onclick="return confirm('Завершить дисциплину? Места будут распределены окончательно.')">
+               ✅ Завершить дисциплину
+            </a>
         </div>
         
         {% for heat in group.heats %}
@@ -24,20 +30,19 @@
                 <span style="color:#999;font-size:12px;" class="toggle-icon">▼</span>
             </div>
             <div class="heat-content" style="display:none;padding:0 20px 16px;">
-                <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+                <table style="width:100%;border-collapse:collapse;">
                     <thead>
                         <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
-                            <th style="padding:8px 10px;text-align:left;font-weight:600;width:40px;">Дор.</th>
-                            <th style="padding:8px 10px;text-align:left;font-weight:600;">Спортсмен</th>
-                            <th style="padding:8px 10px;text-align:center;font-weight:600;width:140px;">Результат</th>
+                            <th style="padding:8px 10px;text-align:left;width:40px;">Дор.</th>
+                            <th style="padding:8px 10px;text-align:left;">Спортсмен</th>
+                            <th style="padding:8px 10px;text-align:center;width:140px;">Результат</th>
                         </tr>
                     </thead>
                     <tbody id="heat-{{ heat.id }}">
                         <tr><td colspan="3" style="padding:8px;color:#999;">Загрузка...</td></tr>
                     </tbody>
                 </table>
-                <button onclick="saveHeat(this, {{ heat.id }})" class="btn-glass" style="font-size:13px;">💾 Сохранить результаты</button>
-                <span class="saved-msg" style="margin-left:8px;color:#4caf50;font-size:13px;display:none;">✓ Сохранено</span>
+                <p style="font-size:12px;color:#999;margin-top:8px;">Формат: ММ:СС.мс. Время сохраняется автоматически. Tab — переход к следующей дорожке.</p>
             </div>
         </div>
         {% endfor %}
@@ -66,20 +71,21 @@ async function loadHeatData(container) {
     const heatId = tbody.id.replace('heat-', '');
     if (tbody.dataset.loaded) return;
     tbody.dataset.loaded = '1';
-    
     try {
         const r = await fetch('/competitions/heats/' + heatId + '/data/');
         const data = await r.json();
-        tbody.innerHTML = data.map(a => `
+        tbody.innerHTML = data.map((a, i) => `
             <tr style="border-bottom:1px solid rgba(0,0,0,0.03);">
                 <td style="padding:8px 10px;font-weight:700;color:#1a73e8;">${a.lane}</td>
                 <td style="padding:8px 10px;">${a.name}</td>
                 <td style="padding:6px 10px;text-align:center;">
-                    <input type="text" value="${a.result_time || ''}" data-id="${a.id}"
-                        placeholder="00:00.00" maxlength="8"
-                        style="width:100px;padding:8px 10px;border-radius:8px;border:1px solid ${a.result_time ? '#4caf50' : '#ddd'};text-align:center;font-family:monospace;font-size:14px;"
+                    <input type="text" value="${a.result_time || ''}" data-id="${a.id}" data-index="${i}"
+                        placeholder="00:00.000" maxlength="9"
+                        style="width:110px;padding:8px 10px;border-radius:8px;border:1px solid ${a.result_time ? '#4caf50' : '#ddd'};text-align:center;font-family:monospace;font-size:14px;background:${a.result_time ? '#f0fff0' : 'white'};"
                         onfocus="this.select()"
-                        oninput="formatTime(this)">
+                        oninput="formatTime(this)"
+                        onchange="autoSave(this)"
+                        onkeydown="handleKey(event, ${i}, this)">
                 </td>
             </tr>
         `).join('');
@@ -87,36 +93,46 @@ async function loadHeatData(container) {
 }
 
 function formatTime(input) {
-    let val = input.value.replace(/[^0-9]/g, '').slice(0, 6);
-    if (val.length >= 4) val = val.slice(0,2) + ':' + val.slice(2,4) + '.' + val.slice(4);
+    let val = input.value.replace(/[^0-9]/g, '').slice(0, 7);
+    if (val.length >= 5) val = val.slice(0,2) + ':' + val.slice(2,4) + '.' + val.slice(4);
     else if (val.length >= 2) val = val.slice(0,2) + ':' + val.slice(2);
     input.value = val;
 }
 
-async function saveHeat(btn, heatId) {
-    const container = btn.closest('.heat-content');
-    const inputs = container.querySelectorAll('input[data-id]');
-    const msg = container.querySelector('.saved-msg');
-    let saved = 0;
-    
-    for (let inp of inputs) {
-        const time = inp.value.trim();
-        if (!time) continue;
-        if (!/^\d{2}:\d{2}\.\d{2}$/.test(time)) {
-            inp.style.borderColor = '#ff3b30';
-            continue;
-        }
-        const r = await fetch('/competitions/assignment/' + inp.dataset.id + '/save/', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
-            body: JSON.stringify({time: time})
-        });
-        if (r.ok) { inp.style.borderColor = '#4caf50'; saved++; }
+async function autoSave(input) {
+    const time = input.value.trim();
+    if (!time) return;
+    if (!/^\d{2}:\d{2}\.\d{2,3}$/.test(time)) {
+        input.style.borderColor = '#ff3b30';
+        input.style.background = '#fff5f5';
+        setTimeout(() => { input.style.borderColor = '#ddd'; input.style.background = 'white'; }, 1200);
+        return;
     }
-    
-    if (saved > 0) {
-        msg.style.display = 'inline';
-        setTimeout(() => msg.style.display = 'none', 2000);
+    input.style.borderColor = '#1a73e8';
+    const r = await fetch('/competitions/assignment/' + input.dataset.id + '/save/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+        body: JSON.stringify({time: time})
+    });
+    if (r.ok) {
+        input.style.borderColor = '#4caf50';
+        input.style.background = '#f0fff0';
+    }
+}
+
+function handleKey(event, index, input) {
+    if (event.key === 'Tab') {
+        event.preventDefault();
+        const inputs = [...input.closest('tbody').querySelectorAll('input')];
+        const next = index + 1;
+        if (next < inputs.length) {
+            inputs[next].focus();
+            inputs[next].select();
+        }
+    }
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        autoSave(input);
     }
 }
 </script>

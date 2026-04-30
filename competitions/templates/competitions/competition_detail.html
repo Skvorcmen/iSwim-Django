@@ -41,11 +41,15 @@
         </div>
 
         {% is_secretary as secretary %}
-        {% if secretary %}
-            <div style="margin-top:24px;display:flex;gap:8px;flex-wrap:wrap;">
+        {% if user.is_staff or secretary %}
                 <a href="{% url 'manage_heats' comp.pk %}" class="btn-glass">📋 Управление заплывами</a>
                 <a href="{% url 'manual_register' comp.pk %}" class="btn-glass-outline">📝 Ручная заявка</a>
-                <a href="{% url 'live_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;">▶ Начать соревнование</a>
+                {% if comp.status != 'ongoing' %}
+                    <a href="{% url 'live_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;">▶ Начать соревнование</a>
+                {% else %}
+                    <a href="{% url 'live_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;">▶ Продолжить соревнование</a>
+                {% endif %}
+            <div style="margin-top:24px;display:flex;gap:8px;flex-wrap:wrap;">
                 {% if comp.status == 'upcoming' %}
                     <a href="?close_registration=1" class="btn-glass-outline">🔒 Закрыть приём заявок</a>
                 {% endif %}

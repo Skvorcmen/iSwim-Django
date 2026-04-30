@@ -104,3 +104,13 @@ from competitions.views import registered_athletes
 urlpatterns += [
     path('competitions/<int:pk>/registered/', registered_athletes, name='registered_athletes'),
 ]
+from competitions.views import finish_competition
+
+urlpatterns += [
+    path('competitions/<int:pk>/finish/', finish_competition, name='finish_competition'),
+]
+from users.views import edit_profile
+
+urlpatterns += [
+    path('profile/edit/', edit_profile, name='edit_profile'),
+]
