@@ -4,19 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="реализована подача заявок, сортировка по группам, по заплывам, сейчас обработка заплывов - тестировать нужно">
+    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="починил соревнования">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/activity/templates/activity/activity_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/activity/templates/activity/activity_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/competition_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/competition_detail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/live_competition.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/live_competition.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/manage_heats.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/manage_heats.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/competitions/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/templates/core/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/swim_site/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/swim_site/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/templates/users/athlete_profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/users/templates/users/athlete_profile.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/templates/users/trainer_profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/users/templates/users/trainer_profile.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +156,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777445269720</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="починил соревнования">
+      <option name="closed" value="true" />
+      <created>1777527066772</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1777527066772</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -180,6 +180,7 @@
     <MESSAGE value="добавил поиск пользователей" />
     <MESSAGE value="добавил страницу соревнований" />
     <MESSAGE value="реализована подача заявок, сортировка по группам, по заплывам, сейчас обработка заплывов - тестировать нужно" />
-    <option name="LAST_COMMIT_MESSAGE" value="реализована подача заявок, сортировка по группам, по заплывам, сейчас обработка заплывов - тестировать нужно" />
+    <MESSAGE value="починил соревнования" />
+    <option name="LAST_COMMIT_MESSAGE" value="починил соревнования" />
   </component>
 </project>

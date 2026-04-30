@@ -167,7 +167,7 @@ def upload_application(request, pk):
             else:
                 duplicates += 1
         messages.success(request, f'Загружено: {created} спортсменов. Дубликатов: {duplicates}.')
-        return redirect('competition_detail', pk=pk)
+        return redirect('public_results', pk=pk)
     return render(request, 'competitions/upload_application.html', {'comp': comp})
 
 @user_passes_test(is_secretary)
@@ -205,7 +205,7 @@ def manual_register(request, pk):
             messages.success(request, f'{first_name} {last_name} добавлен в заявки')
         else:
             messages.warning(request, 'Спортсмен уже зарегистрирован на эту дисциплину')
-        return redirect('competition_detail', pk=pk)
+        return redirect('public_results', pk=pk)
     coaches = Trainer.objects.all()
     branches = Branch.objects.filter(is_active=True)
     return render(request, 'competitions/manual_register.html', {'comp': comp, 'coaches': coaches, 'branches': branches})
@@ -245,7 +245,7 @@ def generate_heats(request, pk):
                     if i < len(lane_order):
                         HeatAssignment.objects.create(heat=heat, registration=reg, lane=lane_order[i] + 1)
     messages.success(request, 'Заплывы сформированы!')
-    return redirect('live_competition', pk=pk)
+    return redirect('public_results', pk=pk)
 
 
 def get_grouped_heats(comp):
@@ -259,11 +259,18 @@ def get_grouped_heats(comp):
         key = (h.age_category.id, h.discipline.id)
         if key != current_key:
             current_key = key
+            has_places = HeatAssignment.objects.filter(
+                heat__competition=comp,
+                heat__discipline=h.discipline,
+                heat__age_category=h.age_category,
+                place__isnull=False
+            ).exists()
             groups.append({
                 'category': h.age_category,
                 'discipline': h.discipline,
                 'comp': comp,
-                'heats': []
+                'heats': [],
+                'is_finished': has_places
             })
         groups[-1]['heats'].append(h)
     return groups
@@ -307,6 +314,7 @@ class LiveCompetitionView(LoginRequiredMixin, TemplateView):
         ctx = super().get_context_data(**kwargs)
         ctx['comp'] = get_object_or_404(Competition, pk=self.kwargs['pk'])
         ctx['groups'] = get_grouped_heats(ctx['comp'])  # ('age_category__birth_year_from', 'age_category__gender', 'discipline__style', 'discipline__distance', 'number')
+        ctx["all_disciplines_done"] = all(g["is_finished"] for g in ctx["groups"])
         return ctx
 
 @user_passes_test(is_secretary)
@@ -368,8 +376,8 @@ def finalize_results(request, pk, discipline_id, category_id):
     )
     dnf.update(place=None)
     
-    messages.success(request, 'Результаты финализированы! Места распределены.')
-    return redirect('live_competition', pk=pk)
+    messages.success(request, '✅ Дисциплина завершена! Места распределены. Результаты доступны на странице просмотра.')
+    return redirect('public_results', pk=pk)
 
 @user_passes_test(is_secretary)
 def reorder_heats(request, pk):
@@ -471,4 +479,4 @@ def finish_competition(request, pk):
     )
     
     messages.success(request, 'Соревнование завершено! Результаты опубликованы.')
-    return redirect('live_competition', pk=pk)
+    return redirect('public_results', pk=pk)
