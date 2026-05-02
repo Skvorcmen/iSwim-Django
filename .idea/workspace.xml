@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="починил соревнования">
+    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="починил соревнования настроил кнопки завершения дисциплин и соревнования">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/competitions/templates/competitions/live_competition.html" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/templates/competitions/live_competition.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/competitions/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/competitions/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +161,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777527066772</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="починил соревнования настроил кнопки завершения дисциплин и соревнования">
+      <option name="closed" value="true" />
+      <created>1777528114875</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1777528114875</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -181,6 +186,7 @@
     <MESSAGE value="добавил страницу соревнований" />
     <MESSAGE value="реализована подача заявок, сортировка по группам, по заплывам, сейчас обработка заплывов - тестировать нужно" />
     <MESSAGE value="починил соревнования" />
-    <option name="LAST_COMMIT_MESSAGE" value="починил соревнования" />
+    <MESSAGE value="починил соревнования настроил кнопки завершения дисциплин и соревнования" />
+    <option name="LAST_COMMIT_MESSAGE" value="починил соревнования настроил кнопки завершения дисциплин и соревнования" />
   </component>
 </project>
