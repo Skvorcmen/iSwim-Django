@@ -1,31 +1,36 @@
 {% extends 'core/base.html' %}
 {% block content %}
 <div class="container" style="max-width:900px;">
+    <div id="save-feedback" style="display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;font-size:14px;"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <div>
             <h1 class="page-title" style="margin:0;">{{ comp.title }}</h1>
-            <span style="color:#1a73e8;font-weight:600;">{{ comp.get_status_display }}</span>
+            <span id="competition-status-label" style="color:#1a73e8;font-weight:600;">{{ comp.get_status_display }}</span>
         </div>
         <div style="display:flex;gap:8px;">
-            {% if all_disciplines_done %}
-            <a href="{% url 'finish_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;font-size:13px;" onclick="return confirm('Завершить соревнование?')">🏁 Завершить соревнование</a>
+            {% if can_finish_competition %}
+            <a id="finish-competition-btn" href="{% url 'finish_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;font-size:13px;" onclick="return confirm('Завершить соревнование?')">🏁 Завершить соревнование</a>
+            {% else %}
+            <span id="finish-competition-disabled" style="background:#eef2f7;color:#637083;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;" title="{{ finish_block_reason }}">🏁 Завершение недоступно</span>
             {% endif %}
             <a href="{% url 'competition_detail' comp.pk %}" class="btn-glass-outline">← Назад</a>
         </div>
     </div>
 
     {% for group in groups %}
-    <div style="margin-bottom:24px;">
+    <div style="margin-bottom:24px;" data-group-category-id="{{ group.category.id }}" data-group-discipline-id="{{ group.discipline.id }}">
         <div style="padding:12px 16px;background:rgba(26,115,232,0.05);border-radius:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
             <h3 style="font-weight:700;color:#1a73e8;margin:0;font-size:18px;">
                 {{ group.category.name }} ({{ group.category.get_gender_display }}) — {{ group.discipline.get_style_display }} {{ group.discipline.distance }}м
             </h3>
             {% if group.is_finished %}
-            <span style="background:#27ae60;color:white;padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;">✅ Завершено</span>
-            {% else %}
-            <a href="{% url 'finalize_results' comp.pk group.discipline.id group.category.id %}"
+            <span class="group-status-completed" style="background:#27ae60;color:white;padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;">✅ Завершено</span>
+            {% elif group.can_finalize %}
+            <a class="group-finalize-link" href="{% url 'finalize_results' comp.pk group.discipline.id group.category.id %}"
                style="background:#27ae60;color:white;padding:8px 18px;border-radius:10px;font-size:13px;text-decoration:none;font-weight:600;"
                onclick="return confirm('Завершить дисциплину?')">✅ Завершить дисциплину</a>
+            {% else %}
+            <span class="group-status-disabled" style="background:#eef2f7;color:#637083;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;" title="{{ group.finalize_block_reason }}">✅ Недоступно</span>
             {% endif %}
         </div>
         
@@ -50,10 +55,111 @@
 </div>
 
 <script>
+function showFeedback(text,isError){
+    const box=document.getElementById('save-feedback');
+    if(!box)return;
+    box.textContent=text;
+    box.style.display='block';
+    box.style.background=isError?'#fdecea':'#e8f5e9';
+    box.style.color=isError?'#b71c1c':'#1b5e20';
+    box.style.border='1px solid '+(isError?'#f5c6cb':'#c8e6c9');
+    clearTimeout(window._feedbackTimer);
+    window._feedbackTimer=setTimeout(()=>{box.style.display='none';},2500);
+}
 function toggleHeat(h){let c=h.nextElementSibling,i=h.querySelector('.toggle-icon');if(c.style.display==='none'){c.style.display='block';i.textContent='▲';loadHeat(c);}else{c.style.display='none';i.textContent='▼';}}
-async function loadHeat(c){let t=c.querySelector('tbody'),id=t.id.replace('heat-','');if(t.dataset.loaded)return;t.dataset.loaded='1';let r=await fetch('/competitions/heats/'+id+'/data/'),d=await r.json();t.innerHTML=d.map((a,i)=>`<tr><td style="padding:8px;font-weight:700;color:#1a73e8;">${a.lane}</td><td style="padding:8px;">${a.name}</td><td style="padding:6px;text-align:center;"><input value="${a.result_time||''}" data-id="${a.id}" data-index="${i}" placeholder="00:00.000" maxlength="9" style="width:110px;padding:8px;border-radius:8px;border:1px solid ${a.result_time?'#4caf50':'#ddd'};text-align:center;font-family:monospace;font-size:14px;background:${a.result_time?'#f0fff0':'white'};" onfocus="this.select()" oninput="formatTime(this)" onchange="saveTime(this)" onkeydown="handleKey(event,${i},this)"></td></tr>`).join('');}
+async function loadHeat(c,force=false){let t=c.querySelector('tbody'),id=t.id.replace('heat-','');if(t.dataset.loaded&&!force)return;t.dataset.loaded='1';let r=await fetch('/competitions/heats/'+id+'/data/'),d=await r.json();t.innerHTML=d.map((a,i)=>`<tr><td style="padding:8px;font-weight:700;color:#1a73e8;">${a.lane}</td><td style="padding:8px;">${a.name}</td><td style="padding:6px;text-align:center;"><input value="${a.result_time||''}" data-id="${a.id}" data-index="${i}" placeholder="00:00.000" maxlength="9" style="width:110px;padding:8px;border-radius:8px;border:1px solid ${a.result_time?'#4caf50':'#ddd'};text-align:center;font-family:monospace;font-size:14px;background:${a.result_time?'#f0fff0':'white'};" onfocus="this.select()" oninput="formatTime(this)" onchange="saveTime(this)" onkeydown="handleKey(event,${i},this)"></td></tr>`).join('');}
 function formatTime(i){let v=i.value.replace(/[^0-9]/g,'').slice(0,7);if(v.length>=5)v=v.slice(0,2)+':'+v.slice(2,4)+'.'+v.slice(4);else if(v.length>=2)v=v.slice(0,2)+':'+v.slice(2);i.value=v;}
-async function saveTime(i){let t=i.value.trim();if(!t||!/^\d{2}:\d{2}\.\d{2,3}$/.test(t))return;i.style.borderColor='#1a73e8';let r=await fetch('/competitions/assignment/'+i.dataset.id+'/save/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({time:t})});if(r.ok){i.style.borderColor='#4caf50';i.style.background='#f0fff0';}}
+async function saveTime(i){
+    let t=i.value.trim();
+    if(!t||!/^\d{2}:\d{2}\.\d{2,3}$/.test(t)){showFeedback('Неверный формат времени. Используйте ММ:СС.сс(с).',true);return;}
+    i.style.borderColor='#1a73e8';
+    let r=await fetch('/competitions/assignment/'+i.dataset.id+'/save/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({time:t})});
+    if(r.ok){i.style.borderColor='#4caf50';i.style.background='#f0fff0';showFeedback('Результат сохранён',false);return;}
+    let msg='Не удалось сохранить результат';
+    try{let j=await r.json();if(j&&j.error)msg=j.error;}catch(e){}
+    i.style.borderColor='#e74c3c';
+    showFeedback(msg,true);
+}
 function handleKey(e,i,p){if(e.key==='Tab'){e.preventDefault();let inputs=[...p.closest('tbody').querySelectorAll('input')];if(inputs[i+1]){inputs[i+1].focus();inputs[i+1].select();}}if(e.key==='Enter'){e.preventDefault();saveTime(p);}}
+
+function markGroupFinalized(categoryId, disciplineId){
+    const selector = `[data-group-category-id="${categoryId}"][data-group-discipline-id="${disciplineId}"]`;
+    const group = document.querySelector(selector);
+    if(!group) return;
+    const header = group.firstElementChild;
+    const completed = document.createElement('span');
+    completed.className = 'group-status-completed';
+    completed.style.cssText = 'background:#27ae60;color:white;padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;';
+    completed.textContent = '✅ Завершено';
+    const old = header.querySelector('.group-finalize-link, .group-status-disabled, .group-status-completed');
+    if(old) old.replaceWith(completed);
+}
+
+function refreshFinishCompetitionControl(){
+    const groups = [...document.querySelectorAll('[data-group-category-id]')];
+    if(!groups.length) return;
+    const allFinalized = groups.every(g => !!g.querySelector('.group-status-completed'));
+    if(!allFinalized) return;
+    const disabled = document.getElementById('finish-competition-disabled');
+    if(disabled){
+        const link = document.createElement('a');
+        link.id = 'finish-competition-btn';
+        link.href = `{% url 'finish_competition' comp.pk %}`;
+        link.className = 'btn-glass';
+        link.style.cssText = 'background:#e74c3c;font-size:13px;';
+        link.textContent = '🏁 Завершить соревнование';
+        link.onclick = () => confirm('Завершить соревнование?');
+        disabled.replaceWith(link);
+    }
+}
+
+function applyCompetitionFinishedState(){
+    const status = document.getElementById('competition-status-label');
+    if(status) status.textContent = 'Завершено';
+    const finishBtn = document.getElementById('finish-competition-btn');
+    if(finishBtn){
+        const completed = document.createElement('span');
+        completed.id = 'finish-competition-completed';
+        completed.style.cssText = 'background:#27ae60;color:white;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;';
+        completed.textContent = '🏁 Соревнование завершено';
+        finishBtn.replaceWith(completed);
+    }
+    const finalizeLinks = document.querySelectorAll('.group-finalize-link');
+    finalizeLinks.forEach((link) => {
+        const done = document.createElement('span');
+        done.className = 'group-status-completed';
+        done.style.cssText = 'background:#27ae60;color:white;padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;';
+        done.textContent = '✅ Завершено';
+        link.replaceWith(done);
+    });
+}
+
+(function connectCompetitionSocket(){
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const socket = new WebSocket(`${protocol}://${window.location.host}/ws/competitions/{{ comp.id }}/`);
+    socket.onmessage = function(event){
+        try{
+            const payload = JSON.parse(event.data);
+            if(payload.type === 'result_updated' && payload.heat_id){
+                const tbody = document.getElementById(`heat-${payload.heat_id}`);
+                if(!tbody) return;
+                const content = tbody.closest('.heat-content');
+                if(!content) return;
+                if(content.style.display === 'none') return;
+                loadHeat(content, true);
+            }
+            if(payload.type === 'discipline_finalized'){
+                markGroupFinalized(payload.category_id, payload.discipline_id);
+                refreshFinishCompetitionControl();
+            }
+            if(payload.type === 'competition_finished'){
+                applyCompetitionFinishedState();
+            }
+            if(payload.type === 'heats_regenerated'){
+                window.location.reload();
+            }
+        }catch(e){}
+    };
+})();
 </script>
 {% endblock %}

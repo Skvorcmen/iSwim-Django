@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User, AthleteProfile, SecretaryProfile
 from branches.models import Branch
+from .validators import validate_result_time
 
 class Competition(models.Model):
     STATUS_CHOICES = [
@@ -102,11 +103,24 @@ class Heat(models.Model):
         ordering = ['number']
 
 class HeatAssignment(models.Model):
+    STATUS_CHOICES = [
+        ('finished', 'Завершен'),
+        ('dnf', 'Не финишировал'),
+        ('disqualified', 'Дисквалифицирован'),
+        ('false_start', 'Фальстарт'),
+    ]
     heat = models.ForeignKey(Heat, on_delete=models.CASCADE, related_name='assignments', verbose_name='Заплыв')
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE, verbose_name='Заявка')
     lane = models.PositiveIntegerField(verbose_name='Дорожка')
-    result_time = models.CharField(max_length=20, blank=True, verbose_name='Результат')
+    result_time = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name='Результат',
+        validators=[validate_result_time],
+        help_text='Формат: M:SS.ss или MM:SS.ss (например: 1:23.45 или 10:45.67)'
+    )
     place = models.PositiveIntegerField(blank=True, null=True, verbose_name='Место')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, blank=True, verbose_name='Статус финиша')
 
     def __str__(self):
         return f'{self.registration.athlete.user.get_full_name()} — Дорожка {self.lane}'
@@ -116,7 +130,64 @@ class HeatAssignment(models.Model):
         verbose_name_plural = 'Назначения в заплывы'
         unique_together = ['heat', 'lane']
 
-from datetime import datetime, date
+class Record(models.Model):
+    competition = models.ForeignKey(Competition, on_delete=models.SET_NULL, null=True, blank=True, related_name='records', verbose_name='Соревнование')
+    discipline = models.ForeignKey(Discipline, on_delete=models.CASCADE, related_name='records', verbose_name='Дисциплина')
+    athlete = models.ForeignKey(AthleteProfile, on_delete=models.CASCADE, related_name='records', verbose_name='Спортсмен')
+    gender = models.CharField(max_length=1, choices=[('M', 'Мужчины'), ('F', 'Женщины')], verbose_name='Пол')
+    age_category = models.ForeignKey(AgeCategory, on_delete=models.CASCADE, related_name='records', verbose_name='Возрастная категория')
+    time = models.CharField(max_length=20, verbose_name='Время', validators=[validate_result_time])
+    date_set = models.DateField(verbose_name='Дата установки рекорда')
+    is_current = models.BooleanField(default=True, verbose_name='Текущий рекорд')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+
+    def __str__(self):
+        return f'{self.discipline} {self.age_category} {self.athlete.user.get_full_name()} {self.time}'
+
+    class Meta:
+        verbose_name = 'Рекорд'
+        verbose_name_plural = 'Рекорды'
+        ordering = ['-date_set', 'discipline', 'age_category', 'gender']
+
+    @classmethod
+    def register_time(cls, assignment):
+        from .services import result_time_to_seconds
+        if not assignment.result_time or assignment.status != 'finished':
+            return None
+
+        try:
+            new_seconds = result_time_to_seconds(assignment.result_time)
+        except ValueError:
+            return None
+
+        current_record = cls.objects.filter(
+            discipline=assignment.heat.discipline,
+            gender=assignment.registration.athlete.gender,
+            age_category=assignment.heat.age_category,
+            is_current=True,
+        ).first()
+
+        if current_record:
+            try:
+                current_seconds = result_time_to_seconds(current_record.time)
+            except ValueError:
+                current_seconds = float('inf')
+            if new_seconds >= current_seconds:
+                return None
+            current_record.is_current = False
+            current_record.save(update_fields=['is_current'])
+
+        return cls.objects.create(
+            competition=assignment.heat.competition,
+            discipline=assignment.heat.discipline,
+            athlete=assignment.registration.athlete,
+            gender=assignment.registration.athlete.gender,
+            age_category=assignment.heat.age_category,
+            time=assignment.result_time,
+            date_set=assignment.heat.competition.start_date,
+            is_current=True,
+        )
+
 
 def check_registration_deadline(competition):
     if competition.status == 'upcoming' and competition.registration_deadline:

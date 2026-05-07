@@ -1,0 +1,57 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<style>
+@media print {
+    .no-print { display: none !important; }
+    .protocol-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+
+<div class="container" style="max-width:1000px;">
+    <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <a href="{% url 'public_results' comp.pk %}" class="btn-glass-outline">← К результатам</a>
+        <div style="display:flex;gap:8px;">
+            <a href="{% url 'competition_protocol_csv' comp.pk %}" class="btn-glass-outline">⬇ CSV</a>
+            <button onclick="window.print()" class="btn-glass">🖨 Печать</button>
+        </div>
+    </div>
+
+    <div class="glass-card protocol-card" style="padding:24px;">
+        <h1 style="margin:0 0 6px 0;">Протокол соревнований</h1>
+        <h2 style="margin:0 0 8px 0;color:#1a73e8;">{{ comp.title }}</h2>
+        <p style="margin:0 0 20px 0;color:#666;">📍 {{ comp.location }} | 📅 {{ comp.start_date|date:"d.m.Y" }}</p>
+
+        {% for group in protocol_groups %}
+        <div style="margin-bottom:20px;">
+            <h3 style="margin-bottom:10px;">
+                {{ group.category.name }} ({{ group.category.get_gender_display }}) — {{ group.discipline.get_style_display }} {{ group.discipline.distance }}м
+            </h3>
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="border-bottom:2px solid #ddd;">
+                        <th style="padding:8px;text-align:left;width:70px;">Место</th>
+                        <th style="padding:8px;text-align:left;">Спортсмен</th>
+                        <th style="padding:8px;text-align:right;width:120px;">Время</th>
+                        <th style="padding:8px;text-align:left;">Филиал</th>
+                        <th style="padding:8px;text-align:left;">Тренер</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in group.rows %}
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:8px;font-weight:700;">{{ row.place }}</td>
+                        <td style="padding:8px;">{{ row.registration.athlete.user.get_full_name }}</td>
+                        <td style="padding:8px;text-align:right;font-family:monospace;">{{ row.result_time }}</td>
+                        <td style="padding:8px;">{{ row.registration.branch.name|default:"—" }}</td>
+                        <td style="padding:8px;">{{ row.registration.coach.get_full_name|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% empty %}
+        <p style="color:#999;">Нет финализированных результатов для протокола.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

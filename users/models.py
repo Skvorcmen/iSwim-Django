@@ -24,11 +24,19 @@ class AthleteProfile(models.Model):
     birth_date = models.DateField(verbose_name='Дата рождения')
     swimming_level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='beginner', verbose_name='Уровень')
     gender = models.CharField(max_length=1, choices=[("M", "Мужчина"), ("F", "Женщина")], default="M", verbose_name="Пол")
+    instagram_url = models.URLField(blank=True, verbose_name='Instagram')
+    experience_years = models.PositiveIntegerField(blank=True, null=True, verbose_name='Стаж плавания (лет)')
     medical_notes = models.TextField(blank=True, verbose_name='Мед. противопоказания')
     parent_contact = models.CharField(max_length=20, blank=True, verbose_name='Контакт родителя')
 
     def __str__(self):
         return f'Спортсмен: {self.user.get_full_name()}'
+
+    @property
+    def age(self):
+        from datetime import date
+        today = date.today()
+        return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
     class Meta:
         verbose_name = 'Спортсмен'

@@ -22,6 +22,31 @@
             <a href="{{ comp.regulation.url }}" target="_blank" style="display:inline-block;margin:12px 0;padding:10px 18px;background:rgba(26,115,232,0.1);border-radius:10px;color:#1a73e8;font-weight:600;text-decoration:none;">📄 Положение (PDF)</a>
         {% endif %}
 
+        <div style="margin-top:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+            <h3 style="margin:0 0 10px 0;font-size:16px;">Статусная панель</h3>
+            <div style="margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:#475569;margin-bottom:4px;">
+                    <span>Прогресс соревнования</span>
+                    <span><b>{{ status_progress_percent }}%</b> ({{ status_progress_text }})</span>
+                </div>
+                <div style="height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
+                    <div style="height:100%;width:{{ status_progress_percent }}%;background:linear-gradient(90deg,#1a73e8,#27ae60);"></div>
+                </div>
+            </div>
+            <div style="display:grid;gap:6px;">
+                {% for step in status_steps %}
+                    <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1px solid #eef2f7;border-radius:8px;padding:8px 10px;">
+                        <span style="font-size:14px;">{{ step.label }}</span>
+                        {% if step.done %}
+                            <span style="color:#166534;font-weight:700;font-size:13px;">✓ Готово</span>
+                        {% else %}
+                            <span style="color:#64748b;font-weight:600;font-size:13px;" title="{{ step.hint }}">• В процессе</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
         <h3 style="margin-top:20px;">Категории</h3>
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
             {% for cat in comp.age_categories.all %}
@@ -44,14 +69,20 @@
         {% if user.is_staff or secretary %}
                 <a href="{% url 'manage_heats' comp.pk %}" class="btn-glass">📋 Управление заплывами</a>
                 <a href="{% url 'manual_register' comp.pk %}" class="btn-glass-outline">📝 Ручная заявка</a>
+                {% if can_start_live %}
                 {% if comp.status != 'ongoing' %}
                     <a href="{% url 'live_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;">▶ Начать соревнование</a>
                 {% else %}
                     <a href="{% url 'live_competition' comp.pk %}" class="btn-glass" style="background:#e74c3c;">▶ Продолжить соревнование</a>
                 {% endif %}
+                {% else %}
+                    <span style="background:#eef2f7;color:#637083;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;" title="{{ start_live_reason }}">▶ Старт недоступен</span>
+                {% endif %}
             <div style="margin-top:24px;display:flex;gap:8px;flex-wrap:wrap;">
-                {% if comp.status == 'upcoming' %}
+                {% if can_close_registration %}
                     <a href="?close_registration=1" class="btn-glass-outline">🔒 Закрыть приём заявок</a>
+                {% else %}
+                    <span style="background:#eef2f7;color:#637083;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;" title="{{ close_registration_reason }}">🔒 Закрытие недоступно</span>
                 {% endif %}
             </div>
         {% endif %}
@@ -60,8 +91,10 @@
             <a href="{% url 'public_results' comp.pk %}" class="btn-glass-outline" style="background:#27ae60;color:white;">📺 Смотреть результаты</a>
         </div>
 
-        {% if user.is_authenticated and user.trainer_profile and comp.status == 'upcoming' %}
+        {% if user.is_authenticated and user.trainer_profile and trainer_can_apply %}
             <a href="{% url 'upload_application' comp.pk %}" class="btn-glass" style="margin-top:16px;">📝 Подать заявку</a>
+        {% elif user.is_authenticated and user.trainer_profile %}
+            <span style="display:inline-block;margin-top:16px;background:#eef2f7;color:#637083;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;" title="{{ trainer_apply_reason }}">📝 Подача недоступна</span>
         {% endif %}
     </div>
 </div>

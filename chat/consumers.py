@@ -12,6 +12,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
+        is_participant = await self.user_in_room()
+        if not is_participant:
+            await self.close()
+            return
+
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
@@ -59,5 +64,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message(self, text):
         from .models import ChatRoom, Message
-        room = ChatRoom.objects.get(id=self.room_id)
+        room = ChatRoom.objects.get(id=self.room_id, participants=self.user)
         return Message.objects.create(room=room, sender=self.user, text=text)
+
+    @database_sync_to_async
+    def user_in_room(self):
+        from .models import ChatRoom
+        return ChatRoom.objects.filter(id=self.room_id, participants=self.user).exists()

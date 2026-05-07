@@ -1,0 +1,141 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container" style="max-width:1200px;">
+    <!-- Header -->
+    <div class="glass-card" style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;">
+            <div style="display:flex;gap:16px;align-items:center;">
+                {% if trainer.photo %}
+                    <img src="{{ trainer.photo.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+                {% endif %}
+                <div>
+                    <h1 style="margin:0;font-weight:700;">{{ user.get_full_name }}</h1>
+                    <p style="margin:4px 0;color:#666;"><strong>{{ trainer.specialization }}</strong></p>
+                    <p style="margin:0;color:#999;font-size:14px;">Стаж: {{ trainer.experience_years }} лет | Рейтинг: ⭐ {{ trainer.rating_display }}</p>
+                </div>
+            </div>
+            <a href="{% url 'edit_profile' %}" class="btn-glass" style="padding:10px 20px;">✏️ Редактировать</a>
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Мои спортсмены</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">{{ students_count }}</div>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Соревнований</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">{{ upcoming_competitions_count }}</div>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Филиалы</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">{{ branches_count }}</div>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Рейтинг</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">⭐ {{ trainer.rating_display }}</div>
+        </div>
+    </div>
+
+    <!-- О тренере -->
+    {% if trainer.bio %}
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h2 style="font-weight:700;margin-bottom:16px;">📝 Обо мне</h2>
+        <p style="color:#444;line-height:1.8;margin:0;">{{ trainer.bio }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Программы -->
+    {% if trainer.programs %}
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h2 style="font-weight:700;margin-bottom:16px;">🎯 Программы и услуги</h2>
+        <div style="color:#444;line-height:1.8;">{{ trainer.programs|linebreaksbr }}</div>
+    </div>
+    {% endif %}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+        <!-- Контакты -->
+        <div class="glass-card">
+            <h2 style="font-weight:700;margin-bottom:16px;">📞 Связь со мной</h2>
+            <div style="display:grid;gap:10px;">
+                {% if trainer.whatsapp_url %}
+                    <a href="{{ trainer.whatsapp_url }}" target="_blank" class="btn-glass" style="width:100%;text-align:center;">💬 Написать в WhatsApp</a>
+                {% endif %}
+                {% if trainer.instagram_url %}
+                    <a href="{{ trainer.instagram_url }}" target="_blank" class="btn-glass-outline" style="width:100%;text-align:center;">📸 Instagram</a>
+                {% endif %}
+                <a href="mailto:{{ user.email }}" class="btn-glass-outline" style="width:100%;text-align:center;">✉️ {{ user.email }}</a>
+                {% if user.phone %}
+                    <div style="background:rgba(255,255,255,0.8);border-radius:16px;padding:12px;text-align:center;color:#666;">
+                        📱 {{ user.phone }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Филиалы -->
+        {% if branches %}
+        <div class="glass-card">
+            <h2 style="font-weight:700;margin-bottom:16px;">🏊 Мои филиалы</h2>
+            <div style="display:grid;gap:8px;">
+                {% for branch in branches %}
+                <a href="{% url 'branch_detail' branch.pk %}" style="text-decoration:none;color:inherit;">
+                    <div style="background:rgba(255,255,255,0.8);border-radius:12px;padding:12px;border-left:3px solid #1a73e8;">
+                        <div style="font-weight:700;color:#1a73e8;">{{ branch.name }}</div>
+                        <p style="margin:4px 0 0;color:#666;font-size:13px;">📍 {{ branch.address }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Мои спортсмены -->
+    {% if students %}
+    <div class="glass-card">
+        <h2 style="font-weight:700;margin-bottom:16px;">👥 Мои спортсмены ({{ students_count }})</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+            {% for athlete in students %}
+            <a href="{% url 'public_athlete' athlete.user.username %}" style="text-decoration:none;color:inherit;">
+                <div style="background:rgba(255,255,255,0.85);border-radius:16px;padding:16px;min-height:180px;display:flex;flex-direction:column;justify-content:space-between;transition:all 0.3s;">
+                    <div>
+                        {% if athlete.user.avatar %}
+                            <img src="{{ athlete.user.avatar.url }}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;margin-bottom:12px;">
+                        {% endif %}
+                        <h3 style="margin:0 0 6px;font-size:17px;font-weight:700;">{{ athlete.user.get_full_name }}</h3>
+                        <p style="margin:0;color:#666;font-size:13px;">{{ athlete.get_swimming_level_display }}</p>
+                    </div>
+                    <div style="margin-top:10px;font-size:12px;color:#999;">
+                        <p style="margin:0;">Возраст: {{ athlete.age }} | Стаж: {{ athlete.experience_years|default:"—" }} лет</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Предстоящие соревнования -->
+    {% if upcoming_competitions %}
+    <div class="glass-card" style="margin-top:24px;">
+        <h2 style="font-weight:700;margin-bottom:16px;">📅 Соревнования моих спортсменов</h2>
+        <div style="display:grid;gap:12px;">
+            {% for reg in upcoming_competitions %}
+            <div style="background:rgba(255,255,255,0.8);border-radius:16px;padding:14px;border-left:4px solid #1a73e8;">
+                <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap;">
+                    <div>
+                        <a href="{% url 'competition_detail' reg.competition.pk %}" style="color:#1a73e8;font-weight:700;text-decoration:none;">{{ reg.competition.title }}</a>
+                        <p style="margin:6px 0 0;color:#666;font-size:14px;">Спортсмен: <strong>{{ reg.athlete.user.get_full_name }}</strong></p>
+                        <p style="margin:4px 0 0;color:#666;font-size:14px;">Дисциплина: {{ reg.discipline }}</p>
+                    </div>
+                    <span style="color:#999;font-size:13px;white-space:nowrap;">{{ reg.competition.start_date|date:"d.m" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

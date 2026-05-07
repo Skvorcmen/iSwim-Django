@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db.models import Q
 from .models import ChatRoom, Message
+from users.auth import has_role
 from users.models import User
 from trainers.models import Trainer
 
@@ -53,7 +54,7 @@ def create_room(request):
 
     users = User.objects.exclude(id=request.user.id)
     context = {'users': users}
-    if hasattr(request.user, 'trainer_profile') or request.user.is_staff:
+    if has_role(request.user, 'trainer', 'admin'):
         context['can_create_group'] = True
     return render(request, 'chat/create_room.html', context)
 

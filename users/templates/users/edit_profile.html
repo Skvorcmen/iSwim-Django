@@ -16,9 +16,19 @@
             </div>
             {% if user.trainer_profile %}
                 <div style="margin-bottom:12px;"><label>Специализация</label><input name="specialization" value="{{ user.trainer_profile.specialization }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+                <div style="margin-bottom:12px;"><label>Стаж (лет)</label><input name="experience_years" type="number" min="0" value="{{ user.trainer_profile.experience_years }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
                 <div style="margin-bottom:12px;"><label>О себе</label><textarea name="bio" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">{{ user.trainer_profile.bio }}</textarea></div>
+                <div style="margin-bottom:12px;"><label>Программы и услуги</label><textarea name="programs" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">{{ user.trainer_profile.programs }}</textarea></div>
+                <div style="margin-bottom:12px;"><label>Сертификаты и лицензии</label><textarea name="certifications" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">{{ user.trainer_profile.certifications }}</textarea></div>
+                <div style="margin-bottom:12px;"><label>Расписание</label><textarea name="schedule" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">{{ user.trainer_profile.schedule }}</textarea></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div><label>WhatsApp</label><input name="whatsapp_url" value="{{ user.trainer_profile.whatsapp_url }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+                    <div><label>Instagram</label><input name="instagram_url" value="{{ user.trainer_profile.instagram_url }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+                </div>
             {% endif %}
             {% if user.athlete_profile %}
+                <div style="margin-bottom:12px;"><label>Instagram</label><input name="instagram_url" value="{{ user.athlete_profile.instagram_url }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
+                <div style="margin-bottom:12px;"><label>Стаж плавания (лет)</label><input name="experience_years" type="number" min="0" value="{{ user.athlete_profile.experience_years }}" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;"></div>
                 <div style="margin-bottom:12px;"><label>Медицинские заметки</label><textarea name="medical_notes" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;">{{ user.athlete_profile.medical_notes }}</textarea></div>
             {% endif %}
             <button type="submit" class="btn-glass" style="width:100%;">Сохранить</button>

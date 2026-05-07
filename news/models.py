@@ -3,11 +3,12 @@ from django.db import models
 class News(models.Model):
     title = models.CharField(max_length=200, verbose_name='Заголовок')
     slug = models.SlugField(unique=True, verbose_name='ЧПУ')
-    image = models.ImageField(upload_to='news/', verbose_name='Изображение')
+    image = models.ImageField(upload_to='news/', blank=True, verbose_name='Изображение')
     short_text = models.TextField(verbose_name='Краткий текст')
     full_text = models.TextField(verbose_name='Полный текст')
     published_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
+    competition = models.ForeignKey('competitions.Competition', on_delete=models.CASCADE, related_name='news', null=True, blank=True, verbose_name='Соревнование')
 
     def __str__(self):
         return self.title

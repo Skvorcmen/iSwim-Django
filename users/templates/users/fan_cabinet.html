@@ -1,0 +1,121 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container" style="max-width:1200px;">
+    <!-- Header -->
+    <div class="glass-card" style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;">
+            <div style="display:flex;gap:16px;align-items:center;">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+                {% endif %}
+                <div>
+                    <h1 style="margin:0;font-weight:700;">Привет, {{ user.first_name }}! 👋</h1>
+                    <p style="margin:4px 0;color:#666;">Персональный кабинет болельщика</p>
+                    <p style="margin:0;color:#999;font-size:14px;">Следите за своими любимыми спортсменами</p>
+                </div>
+            </div>
+            <a href="{% url 'edit_profile' %}" class="btn-glass" style="padding:10px 20px;">✏️ Редактировать</a>
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Избранных спортсменов</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">{{ favorite_count }}</div>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Предстоящих соревнований</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">{{ upcoming_competitions|length }}</div>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Достижений</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">🏆 {{ total_achievements }}</div>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:14px;color:#999;">Медалей</div>
+            <div style="font-size:32px;font-weight:700;margin-top:8px;">🥇 {{ total_medals }}</div>
+        </div>
+    </div>
+
+    <!-- Мои избранные спортсмены -->
+    {% if favorite_athletes %}
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h2 style="font-weight:700;margin-bottom:16px;">⭐ Мои избранные спортсмены ({{ favorite_count }})</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+            {% for athlete in favorite_athletes %}
+            <a href="{% url 'public_athlete' athlete.user.username %}" style="text-decoration:none;color:inherit;">
+                <div style="background:rgba(255,255,255,0.85);border-radius:18px;padding:18px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;transition:all 0.3s;border-top:4px solid #1a73e8;">
+                    <div>
+                        {% if athlete.user.avatar %}
+                            <img src="{{ athlete.user.avatar.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:14px;">
+                        {% endif %}
+                        <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;">{{ athlete.user.get_full_name }}</h3>
+                        <div style="color:#666;font-size:14px;margin-bottom:8px;">{{ athlete.get_swimming_level_display }}</div>
+                        {% if athlete.instagram_url %}
+                            <div style="font-size:13px;color:#1a73e8;margin-bottom:8px;">@{{ athlete.instagram_url|cut:'https://www.instagram.com/'|cut:'https://instagram.com/'|cut:'/' }}</div>
+                        {% endif %}
+                    </div>
+                    <div style="padding-top:10px;border-top:1px solid rgba(0,0,0,0.05);font-size:12px;color:#999;">
+                        <p style="margin:0;">Возраст: {{ athlete.age }} лет</p>
+                        <p style="margin:4px 0 0;">Стаж: {{ athlete.experience_years|default:"—" }} лет</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="glass-card" style="margin-bottom:24px;text-align:center;padding:40px 20px;">
+        <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+        <h3 style="margin-bottom:8px;">Нет избранных спортсменов</h3>
+        <p style="color:#666;margin:0;">Начните добавлять спортсменов в избранное, чтобы следить за их достижениями и соревнованиями.</p>
+    </div>
+    {% endif %}
+
+    <!-- Соревнования избранных -->
+    {% if upcoming_competitions %}
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h2 style="font-weight:700;margin-bottom:16px;">📅 Ближайшие соревнования</h2>
+        <div style="display:grid;gap:12px;">
+            {% for registration in upcoming_competitions %}
+            <div style="background:rgba(255,255,255,0.85);border-radius:16px;padding:14px;border-left:4px solid #1a73e8;">
+                <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap;">
+                    <div>
+                        <a href="{% url 'competition_detail' registration.competition.pk %}" style="color:#1a73e8;font-weight:700;text-decoration:none;">{{ registration.competition.title }}</a>
+                        <p style="margin:6px 0 0;color:#666;font-size:14px;">Спортсмен: <strong>{{ registration.athlete.user.get_full_name }}</strong></p>
+                        <p style="margin:4px 0 0;color:#666;font-size:14px;">Дисциплина: {{ registration.discipline }}</p>
+                    </div>
+                    <span style="color:#999;font-size:13px;white-space:nowrap;">{{ registration.competition.start_date|date:"d.m.Y" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Достижения избранных -->
+    {% if recent_achievements %}
+    <div class="glass-card">
+        <h2 style="font-weight:700;margin-bottom:16px;">🏆 Достижения избранных</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+            {% for achievement in recent_achievements %}
+            <div style="background:rgba(255,255,255,0.85);border-radius:16px;padding:14px;border-top:3px solid #ffc107;">
+                <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;">
+                    <div style="flex:1;">
+                        <h4 style="margin:0 0 4px;font-weight:700;">{{ achievement.title }}</h4>
+                        <p style="margin:0 0 6px;color:#666;font-size:13px;">{{ achievement.get_achievement_type_display }}</p>
+                        <p style="margin:0;color:#999;font-size:12px;">
+                            <strong>{{ achievement.athlete.user.get_full_name }}</strong>
+                        </p>
+                        {% if achievement.competition %}<p style="color:#999;font-size:12px;margin:4px 0 0;">{{ achievement.competition }}</p>{% endif %}
+                    </div>
+                    <span style="color:#999;font-size:12px;white-space:nowrap;">{{ achievement.date|date:"d.m.Y" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

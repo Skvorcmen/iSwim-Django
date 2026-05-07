@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>i.SWiM — школа плавания</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #e8f0fe 0%, #d4e4fc 30%, #e0f0ff 60%, #c8ddf8 100%);
-            background-attachment: fixed; min-height: 100vh; color: #1a1a2e;
+            background-attachment: scroll; min-height: 100vh; color: #1a1a2e;
         }
         .navbar {
             position: sticky; top: 20px; z-index: 100; margin: 20px auto; max-width: 1200px;
@@ -63,9 +66,11 @@
             <li><a href="/branches/">Филиалы</a></li>
             <li><a href="/competitions/">Соревнования</a></li>
             <li><a href="/trainers/">Тренеры</a></li>
+            <li><a href="/activity/">Лента</a></li>
         </ul>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;margin-left:auto;">
             {% if user.is_authenticated %}
+                <a href="/activity/me/" class="btn-glass-outline">Моя лента</a>
                 <a href="/chat/" class="btn-glass-outline">💬</a>
                 <a href="/profile/" class="btn-glass-outline">Кабинет</a>
                 <a href="/accounts/logout/" class="btn-glass-outline">Выйти</a>
@@ -82,7 +87,8 @@
             <div>
                 <a href="/news/" style="display:block;margin-bottom:6px;">Новости</a>
                 <a href="/academy/" style="display:block;margin-bottom:6px;">Академия</a>
-                <a href="/branches/" style="display:block;">Филиалы</a>
+                <a href="/branches/" style="display:block;margin-bottom:6px;">Филиалы</a>
+                <a href="/activity/" style="display:block;margin-bottom:6px;">Лента</a>
             </div>
             <div><p style="color:#666;">+7 (701) 537 88 86</p><p style="color:#666;">info@iswim.kz</p></div>
         </div>

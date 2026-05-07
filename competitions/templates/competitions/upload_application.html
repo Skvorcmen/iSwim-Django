@@ -11,6 +11,28 @@
             <input type="file" name="file" accept=".xlsx" required style="margin-bottom:16px;display:block;width:100%;">
             <button type="submit" class="btn-glass" style="width:100%;">Отправить заявку</button>
         </form>
+        {% if import_report %}
+        <div style="margin-top:20px;text-align:left;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+            <h4 style="margin:0 0 10px 0;font-size:16px;">Отчёт импорта</h4>
+            <p style="margin:4px 0;">Создано: <b>{{ import_report.created }}</b></p>
+            <p style="margin:4px 0;">Дубликатов: <b>{{ import_report.duplicates }}</b></p>
+            <p style="margin:4px 0;">Пропущено пустых строк: <b>{{ import_report.skipped }}</b></p>
+            {% if import_report.errors %}
+            <p style="margin:10px 0 6px 0;color:#b45309;"><b>Ошибки:</b></p>
+            <ul style="margin:0;padding-left:18px;color:#b45309;">
+                {% for error in import_report.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            <p style="margin:12px 0 0 0;">
+                <a href="{% url 'download_import_errors_csv' comp.pk %}" class="btn-glass-outline" style="display:inline-block;">Скачать ошибки (.csv)</a>
+            </p>
+            {% else %}
+            <p style="margin:10px 0 0 0;color:#166534;"><b>Ошибок не найдено.</b></p>
+            {% endif %}
+            <p style="margin:12px 0 0 0;"><a href="{% url 'public_results' comp.pk %}" class="btn-glass-outline" style="display:inline-block;">Открыть результаты</a></p>
+        </div>
+        {% endif %}
         <p style="margin-top:16px;"><a href="{% url 'competition_detail' comp.pk %}" style="color:#666;">← Назад</a></p>
     </div>
 </div>
