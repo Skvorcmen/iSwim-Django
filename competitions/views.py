@@ -48,8 +48,7 @@ class CompetitionDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        from .utils import get_or_create_athlete
-from .models import check_registration_deadline
+        from .models import check_registration_deadline
         check_registration_deadline(self.object)
         if request.GET.get('close_registration') and is_secretary(request.user):
             self.object.status = 'closed'
