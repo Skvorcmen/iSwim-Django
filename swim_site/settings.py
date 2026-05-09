@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'competitions',
     'chat',
     'channels',
+    'athlete_stats',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

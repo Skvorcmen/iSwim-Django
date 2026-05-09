@@ -1,0 +1,132 @@
+{% extends 'core/base.html' %}
+{% block title %}Статистика — {{ athlete.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2>{{ athlete.user.get_full_name }}</h2>
+  <p class="text-muted">{{ athlete.get_swimming_level_display|default:"Нет уровня" }} · 
+  {% if athlete.birth_date %}{{ athlete.birth_date|date:"Y" }} г.р.{% else %}Дата не указана{% endif %}</p>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="fs-1 fw-bold text-primary">{{ total_competitions }}</div>
+        <div class="text-muted small">Соревнований</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="fs-1 fw-bold" style="color:#b8860b">{{ medals.gold }}</div>
+        <div class="text-muted small">Золото 🥇</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="fs-1 fw-bold" style="color:#888">{{ medals.silver }}</div>
+        <div class="text-muted small">Серебро 🥈</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="fs-1 fw-bold" style="color:#8b4513">{{ medals.bronze }}</div>
+        <div class="text-muted small">Бронза 🥉</div>
+      </div>
+    </div>
+  </div>
+
+  {% if personal_records %}
+  <h4 class="mb-3">🏆 Личные рекорды</h4>
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-hover">
+      <thead class="table-light">
+        <tr><th>Дисциплина</th><th>Результат</th><th>Соревнование</th><th>Дата</th></tr>
+      </thead>
+      <tbody>
+        {% for pr in personal_records %}
+        <tr>
+          <td>{{ pr.discipline.get_style_display }} {{ pr.discipline.distance }}м</td>
+          <td><strong>{{ pr.result_time }}</strong></td>
+          <td>{{ pr.competition.title|default:"—" }}</td>
+          <td>{{ pr.date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-info">Личных рекордов пока нет. Участвуйте в соревнованиях!</div>
+  {% endif %}
+
+  {% if disciplines %}
+  <h4 class="mb-3">📈 График прогресса</h4>
+  <div class="mb-3">
+    <select id="discipline-select" class="form-select w-auto">
+      {% for d in disciplines %}
+      <option value="{{ d.discipline__id }}">{{ d.discipline__style }} {{ d.discipline__distance }}м</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div style="position:relative; height:400px;">
+    <canvas id="progress-chart"></canvas>
+  </div>
+  {% else %}
+  <div class="alert alert-warning">Нет данных для построения графика.</div>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const athleteId = {{ athlete.id }};
+const disciplines = {{ disciplines_json|safe }};
+let chart = null;
+
+async function loadChart(disciplineId) {
+  const resp = await fetch(`/stats/progress/${athleteId}/${disciplineId}/`);
+  const json = await resp.json();
+  const data = json.data;
+  if (!data.length) return;
+  const labels = data.map(d => d.date);
+  const values = data.map(d => d.seconds);
+  const tooltips = data.map(d => `${d.time} — ${d.competition} (${d.place} место)`);
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('progress-chart'), {
+    type: 'line',
+    data: { 
+      labels: labels, 
+      datasets: [{ 
+        label: 'Результат (сек)', 
+        data: values, 
+        borderColor: '#0d6efd', 
+        backgroundColor: 'rgba(13,110,253,0.08)', 
+        pointRadius: 5, 
+        pointHoverRadius: 7, 
+        tension: 0.3, 
+        fill: true 
+      }] 
+    },
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false, 
+      scales: { 
+        y: { 
+          reverse: true, 
+          title: { display: true, text: 'Секунды (меньше = лучше)' } 
+        } 
+      }, 
+      plugins: { 
+        tooltip: { 
+          callbacks: { 
+            label: (ctx) => tooltips[ctx.dataIndex] 
+          } 
+        } 
+      } 
+    }
+  });
+}
+const sel = document.getElementById('discipline-select');
+if (sel && sel.value) { 
+  loadChart(sel.value); 
+  sel.addEventListener('change', e => loadChart(e.target.value)); 
+}
+</script>
+{% endblock %}

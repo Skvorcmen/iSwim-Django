@@ -18,6 +18,7 @@ from users.views import (
 )
 from chat.views import chat_list, chat_room, create_room, get_users, unread_count
 from activity.views import ActivityListView
+from athlete_stats.views import AthleteStatsView, progress_data
 from competitions.views import (
     export_results_pdf,
     CompetitionListView, CompetitionDetailView, CompetitionCreateView,
@@ -89,6 +90,11 @@ urlpatterns = [
     path('competitions/<int:pk>/results/', PublicResultsView.as_view(), name='public_results'),
     path('competitions/<int:pk>/registered/', registered_athletes, name='registered_athletes'),
     path('competitions/<int:pk>/finish/', finish_competition, name='finish_competition'),
+
+    # Статистика
+    path('stats/', AthleteStatsView.as_view(), name='my_stats'),
+    path('stats/<str:username>/', AthleteStatsView.as_view(), name='athlete_stats'),
+    path('stats/progress/<int:athlete_id>/<int:discipline_id>/', progress_data, name='progress_data'),
     path('competitions/<int:pk>/pdf/', export_results_pdf, name='export_results_pdf'),
     path('competitions/<int:pk>/finalize/<int:discipline_id>/<int:category_id>/', finalize_results, name='finalize_results'),
     path('competitions/heats/<int:heat_id>/data/', heat_data, name='heat_data'),
