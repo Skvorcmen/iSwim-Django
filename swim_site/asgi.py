@@ -1,17 +1,6 @@
-import sys
+import os
+from django.core.asgi import get_asgi_application
 
-print("DEBUG: Test ASGI file is running!", file=sys.stderr)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'swim_site.settings')
 
-async def application(scope, receive, send):
-    print(f"DEBUG: Request received: {scope['type']}", file=sys.stderr)
-    
-    if scope['type'] == 'http':
-        await send({
-            'type': 'http.response.start',
-            'status': 200,
-            'headers': [(b'content-type', b'text/plain')],
-        })
-        await send({
-            'type': 'http.response.body',
-            'body': b'Hello from Render! Django not loaded yet.',
-        })
+application = get_asgi_application()
