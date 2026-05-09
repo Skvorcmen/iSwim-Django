@@ -18,17 +18,16 @@ from users.views import (
 )
 from chat.views import chat_list, chat_room, create_room, get_users, unread_count
 from activity.views import ActivityListView
-from athlete_stats.views import AthleteStatsView, progress_data
 from competitions.views import (
-    export_results_pdf,
     CompetitionListView, CompetitionDetailView, CompetitionCreateView,
     download_template_excel, upload_application,
     generate_heats, manage_heats, LiveCompetitionView,
     save_result, heat_data, available_athletes, add_to_heat,
     manual_register, PublicResultsView, finalize_results,
     reorder_heats, remove_from_heat, group_heats_data,
-    registered_athletes, finish_competition,
+    registered_athletes, finish_competition, export_results_pdf,  # ← ДОБАВЛЕНО!
 )
+from athlete_stats.views import AthleteStatsView, progress_data
 
 urlpatterns = [
     path('', index, name='home'),
@@ -88,38 +87,25 @@ urlpatterns = [
     path('competitions/<int:pk>/heats/', manage_heats, name='manage_heats'),
     path('competitions/<int:pk>/live/', LiveCompetitionView.as_view(), name='live_competition'),
     path('competitions/<int:pk>/results/', PublicResultsView.as_view(), name='public_results'),
+    path('competitions/<int:pk>/pdf/', export_results_pdf, name='export_results_pdf'),
     path('competitions/<int:pk>/registered/', registered_athletes, name='registered_athletes'),
     path('competitions/<int:pk>/finish/', finish_competition, name='finish_competition'),
-
-    # Статистика
-    path('stats/', AthleteStatsView.as_view(), name='my_stats'),
-    path('stats/<str:username>/', AthleteStatsView.as_view(), name='athlete_stats'),
-    path('stats/progress/<int:athlete_id>/<int:discipline_id>/', progress_data, name='progress_data'),
-    path('competitions/<int:pk>/pdf/', export_results_pdf, name='export_results_pdf'),
     path('competitions/<int:pk>/finalize/<int:discipline_id>/<int:category_id>/', finalize_results, name='finalize_results'),
     path('competitions/heats/<int:heat_id>/data/', heat_data, name='heat_data'),
     path('competitions/heats/<int:heat_id>/available/', available_athletes, name='available_athletes'),
     path('competitions/heats/<int:heat_id>/add/', add_to_heat, name='add_to_heat'),
     path('competitions/assignment/<int:assignment_id>/save/', save_result, name='save_result'),
     path('competitions/assignment/<int:assignment_id>/remove/', remove_from_heat, name='remove_from_heat'),
+
+    # Статистика
+    path('stats/', AthleteStatsView.as_view(), name='my_stats'),
+    path('stats/<str:username>/', AthleteStatsView.as_view(), name='athlete_stats'),
+    path('stats/progress/<int:athlete_id>/<int:discipline_id>/', progress_data, name='progress_data'),
+
+    # Health check
+    path('health/', lambda request: __import__('django.http').HttpResponse('OK'), name='health_check'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-# API для мобильного приложения
-from api.views import my_stats, competitions_list, competition_results
-
-urlpatterns += [
-    path('api/my-stats/', my_stats, name='api_my_stats'),
-    path('api/competitions/', competitions_list, name='api_competitions'),
-    path('api/competitions/<int:pk>/results/', competition_results, name='api_competition_results'),
-]
-
-# Health check endpoint (безопасный)
-from competitions.views import health_check
-
-urlpatterns += [
-    path('health/', health_check, name='health_check'),
-]
