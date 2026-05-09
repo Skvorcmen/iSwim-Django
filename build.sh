@@ -1,10 +1,15 @@
 #!/bin/bash
+echo "🚀 Installing system dependencies..."
+apt-get update && apt-get install -y libpq-dev gcc python3-dev
 
-# Установка зависимостей
+echo "🚀 Installing Python packages..."
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Сбор статики
-python manage.py collectstatic --noinput --settings=swim_site.settings_production
+echo "📦 Collecting static files..."
+python manage.py collectstatic --noinput
 
-# Миграции
-python manage.py migrate --settings=swim_site.settings_production
+echo "🗄️ Running migrations..."
+python manage.py migrate
+
+echo "✅ Build completed!"
