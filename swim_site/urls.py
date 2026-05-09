@@ -116,3 +116,10 @@ urlpatterns += [
     path('api/competitions/', competitions_list, name='api_competitions'),
     path('api/competitions/<int:pk>/results/', competition_results, name='api_competition_results'),
 ]
+
+# Health check endpoint (безопасный)
+from competitions.views import health_check
+
+urlpatterns += [
+    path('health/', health_check, name='health_check'),
+]
