@@ -68,10 +68,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'swim_site.wsgi.application'
 ASGI_APPLICATION = 'swim_site.asgi.application'
 
+# PostgreSQL Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'iswim_stats_db',
+        'USER': 'iswim_user',
+        'PASSWORD': 'iSwim123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
