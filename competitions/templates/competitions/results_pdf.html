@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    color: #1a1a1a;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 8px;
+  }
+  .header h1 { font-size: 15px; margin: 0 0 4px; }
+  .header p { margin: 2px 0; font-size: 10px; color: #444; }
+  .meta {
+    font-size: 10px;
+    color: #555;
+    margin-bottom: 12px;
+    display: table;
+    width: 100%;
+  }
+  .meta span { display: table-cell; }
+  .meta span:last-child { text-align: right; }
+  .group { margin-bottom: 16px; }
+  .group-title {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  th {
+    background: #eef0f4;
+    padding: 3px 6px;
+    text-align: left;
+    border: 0.5px solid #ccc;
+    font-weight: bold;
+  }
+  td { padding: 3px 6px; border: 0.5px solid #ddd; }
+  tr.even td { background: #f9f9f9; }
+  .p1 { color: #b8860b; font-weight: bold; }
+  .p2 { color: #555; font-weight: bold; }
+  .p3 { color: #8b4513; font-weight: bold; }
+  .no-results { color: #888; font-style: italic; padding: 4px 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{ comp.title }}</h1>
+  <p>{{ comp.location }} | {{ comp.start_date }}{% if comp.end_date %} — {{ comp.end_date }}{% endif %}</p>
+  <p>Официальный протокол результатов</p>
+</div>
+
+<div class="meta">
+  <span>Участников: {{ total_athletes }}</span>
+  <span>Дисциплин: {{ total_disciplines }}</span>
+  <span>Сформирован: {{ generated_at }}</span>
+</div>
+
+{% for group in groups %}
+<div class="group">
+  <div class="group-title">
+    {{ group.category.name }} ({{ group.category.get_gender_display }}) —
+    {{ group.discipline.get_style_display }} {{ group.discipline.distance }}м
+  </div>
+  {% if group.results %}
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px">Место</th>
+        <th>Спортсмен</th>
+        <th style="width:50px">Год</th>
+        <th>Филиал</th>
+        <th style="width:65px">Результат</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in group.results %}
+      <tr class="{% cycle '' 'even' %}">
+        <td class="{% if r.place == 1 %}p1{% elif r.place == 2 %}p2{% elif r.place == 3 %}p3{% endif %}">
+          {% if r.place == 1 %}1 (зол){% elif r.place == 2 %}2 (сер){% elif r.place == 3 %}3 (бр){% else %}{{ r.place }}{% endif %}
+        </td>
+        <td>{{ r.athlete_name }}</td>
+        <td>{{ r.birth_year }}</td>
+        <td>{{ r.branch }}</td>
+        <td><strong>{{ r.result_time }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="no-results">Результаты не внесены</p>
+  {% endif %}
+</div>
+{% endfor %}
+
+</body>
+</html>

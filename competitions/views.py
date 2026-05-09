@@ -489,3 +489,135 @@ def finish_competition(request, pk):
     
     messages.success(request, 'Соревнование завершено! Результаты опубликованы.')
     return redirect('public_results', pk=pk)
+
+
+from django.template.loader import render_to_string
+from io import BytesIO
+from django.utils.timezone import localtime, now as tz_now
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+
+def export_results_pdf(request, pk):
+    comp = get_object_or_404(Competition, pk=pk)
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer, pagesize=A4,
+        rightMargin=1.5*cm, leftMargin=1.5*cm,
+        topMargin=1.5*cm, bottomMargin=1.5*cm,
+    )
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('title', fontSize=14, alignment=TA_CENTER, fontName='Helvetica-Bold', spaceAfter=4)
+    sub_style = ParagraphStyle('sub', fontSize=9, alignment=TA_CENTER, textColor=colors.HexColor('#555555'), spaceAfter=2)
+    group_style = ParagraphStyle('group', fontSize=10, fontName='Helvetica-Bold', textColor=colors.white,
+                                  backColor=colors.HexColor('#1a1a2e'), spaceAfter=0, spaceBefore=12,
+                                  leftIndent=6)
+
+    elements = []
+
+    # Заголовок
+    elements.append(Paragraph(comp.title, title_style))
+    loc = f"{comp.location} | {comp.start_date}"
+    if comp.end_date:
+        loc += f" — {comp.end_date}"
+    elements.append(Paragraph(loc, sub_style))
+    elements.append(Paragraph("Официальный протокол результатов", sub_style))
+    elements.append(Spacer(1, 0.3*cm))
+
+    total_athletes = set()
+    disciplines_seen = set()
+    groups_data = []
+
+    for age_cat in comp.age_categories.all():
+        for discipline in comp.disciplines.all():
+            assignments = HeatAssignment.objects.filter(
+                heat__competition=comp,
+                heat__discipline=discipline,
+                heat__age_category=age_cat,
+                place__isnull=False,
+            ).select_related(
+                'registration__athlete__user',
+                'registration__branch',
+            ).order_by('place')
+
+            results = []
+            for a in assignments:
+                athlete = a.registration.athlete
+                total_athletes.add(athlete.id)
+                disciplines_seen.add(discipline.id)
+                birth_year = athlete.birth_date.year if athlete.birth_date else ''
+                branch = str(a.registration.branch) if a.registration.branch else '-'
+                results.append([
+                    str(a.place),
+                    athlete.user.get_full_name(),
+                    str(birth_year),
+                    branch,
+                    a.result_time,
+                ])
+
+            if results:
+                groups_data.append({
+                    'title': f"{age_cat.name} ({age_cat.get_gender_display()}) — {discipline.get_style_display()} {discipline.distance}м",
+                    'results': results,
+                })
+
+    # Метаданные
+    generated_at = localtime(tz_now()).strftime('%d.%m.%Y %H:%M')
+    meta_data = [[
+        f"Участников: {len(total_athletes)}",
+        f"Дисциплин: {len(disciplines_seen)}",
+        f"Сформирован: {generated_at}",
+    ]]
+    meta_table = Table(meta_data, colWidths=[5*cm, 5*cm, 7.7*cm])
+    meta_table.setStyle(TableStyle([
+        ('FONTSIZE', (0,0), (-1,-1), 8),
+        ('TEXTCOLOR', (0,0), (-1,-1), colors.HexColor('#555555')),
+        ('ALIGN', (2,0), (2,0), 'RIGHT'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+    ]))
+    elements.append(meta_table)
+
+    # Группы результатов
+    medal = {1: '1 (зол)', 2: '2 (сер)', 3: '3 (бр)'}
+    col_colors = {1: colors.HexColor('#b8860b'), 2: colors.HexColor('#666666'), 3: colors.HexColor('#8b4513')}
+
+    for group in groups_data:
+        elements.append(Paragraph(group['title'], group_style))
+
+        header = [['Место', 'Спортсмен', 'Год', 'Филиал', 'Результат']]
+        rows = header + [[medal.get(int(r[0]), r[0])] + r[1:] for r in group['results']]
+
+        col_widths = [2*cm, 6*cm, 1.8*cm, 4.5*cm, 3.4*cm]
+        t = Table(rows, colWidths=col_widths, repeatRows=1)
+
+        style_cmds = [
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,-1), 9),
+            ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#eef0f4')),
+            ('GRID', (0,0), (-1,-1), 0.4, colors.HexColor('#cccccc')),
+            ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#f9f9f9')]),
+            ('TOPPADDING', (0,0), (-1,-1), 3),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+            ('ALIGN', (4,0), (4,-1), 'CENTER'),
+        ]
+        for i, row in enumerate(group['results'], start=1):
+            place = int(row[0])
+            if place in col_colors:
+                style_cmds.append(('TEXTCOLOR', (0,i), (0,i), col_colors[place]))
+                style_cmds.append(('FONTNAME', (0,i), (0,i), 'Helvetica-Bold'))
+
+        t.setStyle(TableStyle(style_cmds))
+        elements.append(t)
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    filename = f'protocol_{comp.title.replace(" ", "_")}_{comp.start_date}.pdf'
+    response = HttpResponse(buffer.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response

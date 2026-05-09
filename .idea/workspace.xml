@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="починил соревнования настроил кнопки завершения дисциплин и соревнования">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="04b978ca-7d0a-464e-a506-1e7c8051f2fb" name="Changes" comment="починил соревнования настроил кнопки завершения дисциплин и соревнования" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,6 +44,7 @@
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
@@ -80,6 +79,7 @@
       <updated>1773637452534</updated>
       <workItem from="1773637453547" duration="176000" />
       <workItem from="1777374987758" duration="5273000" />
+      <workItem from="1778313330561" duration="714000" />
     </task>
     <task id="LOCAL-00001" summary="создал джанго приложение с папками">
       <option name="closed" value="true" />

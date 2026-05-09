@@ -19,6 +19,7 @@ from users.views import (
 from chat.views import chat_list, chat_room, create_room, get_users, unread_count
 from activity.views import ActivityListView
 from competitions.views import (
+    export_results_pdf,
     CompetitionListView, CompetitionDetailView, CompetitionCreateView,
     download_template_excel, upload_application,
     generate_heats, manage_heats, LiveCompetitionView,
@@ -88,6 +89,7 @@ urlpatterns = [
     path('competitions/<int:pk>/results/', PublicResultsView.as_view(), name='public_results'),
     path('competitions/<int:pk>/registered/', registered_athletes, name='registered_athletes'),
     path('competitions/<int:pk>/finish/', finish_competition, name='finish_competition'),
+    path('competitions/<int:pk>/pdf/', export_results_pdf, name='export_results_pdf'),
     path('competitions/<int:pk>/finalize/<int:discipline_id>/<int:category_id>/', finalize_results, name='finalize_results'),
     path('competitions/heats/<int:heat_id>/data/', heat_data, name='heat_data'),
     path('competitions/heats/<int:heat_id>/available/', available_athletes, name='available_athletes'),
