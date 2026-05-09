@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Count
 from .models import Article, ArticleComment, ArticleLike
 
 class ArticleListView(ListView):
@@ -28,7 +28,7 @@ class ArticleListView(ListView):
         if sort == 'oldest':
             queryset = queryset.order_by('published_at')
         elif sort == 'popular':
-            queryset = sorted(queryset, key=lambda a: a.likes.count(), reverse=True)
+            queryset = queryset.annotate(likes_count=Count('likes')).order_by('-likes_count')
         else:
             queryset = queryset.order_by('-published_at')
         

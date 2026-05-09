@@ -116,15 +116,17 @@ class HeatAssignment(models.Model):
         verbose_name_plural = 'Назначения в заплывы'
         unique_together = ['heat', 'lane']
 
-from datetime import datetime, date
+from django.utils import timezone
 
 def check_registration_deadline(competition):
     if competition.status == 'upcoming' and competition.registration_deadline:
-        now = datetime.now()
+        now = timezone.now()
         d = competition.registration_deadline
         t = competition.registration_deadline_time or '23:59'
         h, m = map(int, t.split(':'))
-        deadline = datetime(d.year, d.month, d.day, h, m)
+        from django.utils.timezone import make_aware
+        import datetime as dt
+        deadline = make_aware(dt.datetime(d.year, d.month, d.day, h, m))
         if now > deadline:
             competition.status = 'closed'
             competition.save()

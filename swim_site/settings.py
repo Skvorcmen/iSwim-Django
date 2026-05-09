@@ -1,13 +1,17 @@
 import os
 from pathlib import Path
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-change-this-later-in-production'
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / '.env')
 
-DEBUG = True
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env.bool('DEBUG', default=False)
+REDIS_URL = env('REDIS_URL', default='redis://127.0.0.1:6379/0')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -24,6 +28,8 @@ INSTALLED_APPS = [
     'trainers',
     'activity',
     'competitions',
+    'chat',
+    'channels',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -59,6 +65,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'swim_site.wsgi.application'
+ASGI_APPLICATION = 'swim_site.asgi.application'
 
 DATABASES = {
     'default': {
@@ -80,6 +87,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -99,13 +107,11 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
-# Channels
-INSTALLED_APPS += ['channels', 'chat']
-ASGI_APPLICATION = 'swim_site.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [REDIS_URL],
+        },
     },
 }
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")

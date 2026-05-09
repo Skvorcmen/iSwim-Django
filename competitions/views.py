@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from django.urls import reverse_lazy
 import openpyxl, io, json
 from openpyxl.worksheet.datavalidation import DataValidation
+from .utils import get_or_create_athlete
 from .models import Competition, AgeCategory, Discipline, Registration, Heat, HeatAssignment
 from users.models import AthleteProfile, User as UserModel
 from trainers.models import Trainer
@@ -47,7 +48,8 @@ class CompetitionDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        from .models import check_registration_deadline
+        from .utils import get_or_create_athlete
+from .models import check_registration_deadline
         check_registration_deadline(self.object)
         if request.GET.get('close_registration') and is_secretary(request.user):
             self.object.status = 'closed'
@@ -144,13 +146,18 @@ def upload_application(request, pk):
             if not row[0] or not row[1]:
                 continue
             last_name, first_name, gender, birth_year, style, distance, time = row[0], row[1], row[2], row[3], row[4], row[5], row[6] or ''
-            user, _ = UserModel.objects.get_or_create(
-                first_name=first_name, last_name=last_name,
-                defaults={'username': f'{last_name}_{first_name}_{birth_year}'.lower()})
-            athlete, _ = AthleteProfile.objects.get_or_create(
-                user=user, defaults={'birth_date': f'{int(birth_year)}-01-01', 'gender': 'M' if str(gender).upper() in ['M', 'М'] else 'F'})
-            athlete.gender = 'M' if str(gender).upper() in ['M', 'М'] else 'F'
-            athlete.save()
+            gender_code = 'M' if str(gender).upper() in ['M', 'М'] else 'F'
+            try:
+                birth_year_int = int(birth_year)
+            except (TypeError, ValueError):
+                duplicates += 1
+                continue
+            athlete, _ = get_or_create_athlete(
+                first_name=first_name,
+                last_name=last_name,
+                birth_year=birth_year_int,
+                gender=gender_code,
+            )
             style_code = style_map.get(str(style).lower(), 'free')
             try:
                 distance_int = int(distance)
@@ -186,13 +193,17 @@ def manual_register(request, pk):
         if not first_name or not last_name:
             messages.error(request, 'Введите имя и фамилию')
             return redirect('manual_register', pk=pk)
-        user, _ = UserModel.objects.get_or_create(
-            first_name=first_name, last_name=last_name,
-            defaults={'username': f'{last_name}_{first_name}_{birth_year}'.lower()})
-        athlete, _ = AthleteProfile.objects.get_or_create(
-            user=user, defaults={'birth_date': f'{int(birth_year)}-01-01', 'gender': gender})
-        athlete.gender = gender
-        athlete.save()
+        try:
+            birth_year_int = int(birth_year)
+        except (TypeError, ValueError):
+            messages.error(request, 'Некорректный год рождения')
+            return redirect('manual_register', pk=pk)
+        athlete, _ = get_or_create_athlete(
+            first_name=first_name,
+            last_name=last_name,
+            birth_year=birth_year_int,
+            gender=gender,
+        )
         discipline = Discipline.objects.filter(competition=comp, style=style, distance=int(distance)).first()
         if not discipline:
             discipline, _ = Discipline.objects.get_or_create(competition=comp, style=style, distance=int(distance))
@@ -357,11 +368,10 @@ def finalize_results(request, pk, discipline_id, category_id):
     
     all_list = list(all_assignments)
     all_list.sort(key=lambda a: time_to_seconds(a.result_time))
-    current_place = 1
     prev_time = None
     for i, a in enumerate(all_list):
         t = time_to_seconds(a.result_time)
-        if prev_time is not None and t > prev_time:
+        if prev_time is None or t > prev_time:
             current_place = i + 1
         a.place = current_place
         a.save()

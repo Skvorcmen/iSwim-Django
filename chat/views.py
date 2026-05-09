@@ -22,8 +22,9 @@ def chat_list(request):
 @login_required
 def chat_room(request, room_id):
     room = get_object_or_404(ChatRoom, id=room_id, participants=request.user)
-    messages = room.messages.all()[:50]
-    room.messages.exclude(sender=request.user).update(is_read=True)
+    messages = list(room.messages.all()[:50])
+    msg_ids = [m.id for m in messages]
+    room.messages.filter(id__in=msg_ids).exclude(sender=request.user).update(is_read=True)
     return render(request, 'chat/chat_room.html', {
         'room': room,
         'messages': messages,
