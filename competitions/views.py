@@ -24,3 +24,32 @@ def health_check(request):
         'has_hosts_var': has_hosts,
         'debug_mode': settings.DEBUG,
     })
+
+# Добавляем недостающие классы в начало файла
+from django.views.generic import ListView, DetailView, CreateView
+from .models import Competition
+
+class CompetitionListView(ListView):
+    model = Competition
+    template_name = 'competitions/competition_list.html'
+    context_object_name = 'competitions'
+
+class CompetitionDetailView(DetailView):
+    model = Competition
+    template_name = 'competitions/competition_detail.html'
+    context_object_name = 'comp'
+
+class CompetitionCreateView(CreateView):
+    model = Competition
+    template_name = 'competitions/competition_form.html'
+    fields = ['title', 'description', 'location', 'start_date', 'end_date', 'status']
+
+class PublicResultsView(DetailView):
+    model = Competition
+    template_name = 'competitions/public_results.html'
+    context_object_name = 'comp'
+
+class LiveCompetitionView(DetailView):
+    model = Competition
+    template_name = 'competitions/live_competition.html'
+    context_object_name = 'comp'
