@@ -9,3 +9,8 @@ __pycache__/
 db.sqlite3
 media/
 staticfiles/
+*.sql
+*.sql.gz
+backups/
+.env
+*.log
