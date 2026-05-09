@@ -17,7 +17,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
+    # Твои приложения
     'users',
+    'core',
+    'news',
+    'academy',
+    'branches',
+    'trainers',
+    'activity',
+    'competitions',
+    'chat',
+    'channels',
+    'athlete_stats',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -79,8 +90,19 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'Asia/Almaty'
 USE_I18N = True
 USE_TZ = True
+
+# Channels
+ASGI_APPLICATION = 'swim_site.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
