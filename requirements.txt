@@ -22,6 +22,7 @@ Django==5.1.15
 django-allauth==65.16.1
 django-environ==0.13.0
 django-extensions==4.1
+djangorestframework==3.17.1
 et_xmlfile==2.0.0
 fastapi==0.136.1
 fonttools==4.62.1
@@ -36,6 +37,7 @@ msgpack==1.1.2
 openpyxl==3.1.5
 packaging==26.2
 pillow==12.2.0
+psycopg2-binary==2.9.12
 py-ubjson==0.16.1
 pyasn1==0.6.3
 pyasn1_modules==0.4.2

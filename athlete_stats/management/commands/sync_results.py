@@ -64,6 +64,15 @@ class Command(BaseCommand):
             )
             if created_pr:
                 updated_prs += 1
+                # Уведомление о новом личном рекорде
+                if athlete.user:
+                    create_notification(
+                        user=athlete.user,
+                        notification_type='new_pr',
+                        title=f'Новый личный рекорд!',
+                        message=f'{athlete.user.get_full_name()} установил новый рекорд в дисциплине {discipline.get_style_display()} {discipline.distance}м: {a.result_time}',
+                        link=f'/stats/progress/{athlete.id}/{discipline.id}/'
+                    )
             else:
                 if seconds < pr.result_seconds:
                     pr.result_time = a.result_time
@@ -72,9 +81,28 @@ class Command(BaseCommand):
                     pr.date = competition.start_date
                     pr.save()
                     updated_prs += 1
+                    # Уведомление об улучшении рекорда
+                    if athlete.user:
+                        create_notification(
+                            user=athlete.user,
+                            notification_type='new_pr',
+                            title=f'Личный рекорд улучшен!',
+                            message=f'{athlete.user.get_full_name()} улучшил результат в дисциплине {discipline.get_style_display()} {discipline.distance}м до {a.result_time}',
+                            link=f'/stats/progress/{athlete.id}/{discipline.id}/'
+                        )
 
         self.stdout.write(
             self.style.SUCCESS(
                 f'✅ Синхронизировано: {created_results} результатов, {updated_prs} личных рекордов обновлено'
             )
         )
+
+def create_notification(user, notification_type, title, message, link=''):
+    from notifications.models import Notification
+    Notification.objects.create(
+        user=user,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        link=link
+    )

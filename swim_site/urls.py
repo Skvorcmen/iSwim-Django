@@ -107,3 +107,12 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# API для мобильного приложения
+from api.views import my_stats, competitions_list, competition_results
+
+urlpatterns += [
+    path('api/my-stats/', my_stats, name='api_my_stats'),
+    path('api/competitions/', competitions_list, name='api_competitions'),
+    path('api/competitions/<int:pk>/results/', competition_results, name='api_competition_results'),
+]

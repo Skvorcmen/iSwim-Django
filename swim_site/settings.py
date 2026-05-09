@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     'chat',
     'channels',
     'athlete_stats',
+    'notifications',
+    'rest_framework',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
