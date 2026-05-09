@@ -1,14 +1,16 @@
 import os
+import sys
+from django.core.asgi import get_asgi_application
+
+# Принудительно устанавливаем настройки
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'swim_site.settings')
 
-from django.core.asgi import get_asgi_application
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
-from chat.routing import websocket_urlpatterns
+# DEBUG: проверяем, что настройки загружаются
+try:
+    from django.conf import settings
+    print(f"DEBUG: ROOT_URLCONF = {getattr(settings, 'ROOT_URLCONF', 'NOT SET')}", file=sys.stderr)
+except Exception as e:
+    print(f"DEBUG: Error loading settings: {e}", file=sys.stderr)
 
-application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
-    "websocket": AuthMiddlewareStack(
-        URLRouter(websocket_urlpatterns)
-    ),
-})
+application = get_asgi_application()
+print("DEBUG: ASGI application created successfully", file=sys.stderr)
